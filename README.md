@@ -1,197 +1,143 @@
 # AI Inbox Triage + Reply Router
 
-An event-driven pipeline with **human-in-the-loop review** that turns a shared
-support/sales inbox into a triaged, auto-drafted queue. It connects to a
-mailbox, **classifies** every incoming email by intent, **drafts a context-aware
-reply grounded in your own knowledge base** (RAG), **routes** it to the right
-person, and surfaces it in a review UI where a human edits and sends with one
-click.
+An AI-powered system that turns a shared support/sales inbox into a calm,
+triaged queue. It connects to a mailbox, **classifies every incoming email by
+intent**, **drafts a context-aware reply grounded in your own knowledge base**,
+**routes it to the right person**, and presents it in a clean review UI where a
+human edits and sends with one click.
 
-> Built to run **100% free**: Groq for the LLM, an offline embedder for RAG, and
-> your own Postgres — no paid API required.
+Small teams lose hours sorting email and writing near-identical replies. This
+keeps a human in control of what gets sent while doing the repetitive triage and
+drafting automatically — cutting first-response time from minutes to seconds.
 
----
-
-## What it does
-
-```
-                      ┌─────────────────────────────────────────────┐
-   Mailbox (IMAP/      │  Ingest → Classify → Route ┬─► Slack notify  │
-   Gmail/Graph)  ──►   │  (dedupe,   (Groq,    (rules │                │
-   poll / webhook      │  sanitise) confidence) →assignee)            │
-                      │              └─► Draft reply (RAG over KB, streamed) │
-                      └───────────────────────┬─────────────────────┘
-                                              ▼
-                         Review UI: triage queue · email detail ·
-                         editable streaming draft + citations ·
-                         one-click Send / Send & log to CRM
-```
-
-- **Ingestion** — Gmail/Microsoft Graph (OAuth) or IMAP (app password). Dedupes
-  by message-id, strips HTML + neutralises prompt-injection, polls every 60s.
-- **Classification** — structured-output `{category, confidence, urgency}` via
-  the Groq wrapper; below a confidence threshold it routes to a human lane
-  instead of guessing. Ships with a labelled eval set (≥90% target).
-- **Knowledge base + RAG** — upload docs → chunk → embed into pgvector →
-  top-k retrieval (org-scoped) to ground drafts and cite sources.
-- **Drafting** — composes a reply from the thread + retrieved knowledge,
-  **streams token-by-token** to the UI, records cited sources.
-- **Routing** — ordered IF/THEN rules → assignee + CRM action, with optional
-  **Slack** notification.
-- **Review UI** — triage queue, two-pane email detail with an editable draft,
-  rules editor, knowledge base, and an analytics dashboard.
-- **Analytics + audit** — volume, category mix, median response time, hours
-  saved, draft-acceptance rate, and a full audit log.
-
-Every email is multi-tenant **org-scoped** at the data layer, and every action
-is written to an audit log.
-
-## Screens
-
-Triage Queue · Email Detail (streaming AI draft + citations) · Routing Rules
-(visual IF/THEN builder) · Knowledge Base · Analytics · Settings (connect
-mailbox). Design system: "Precision Operations" (violet, Geist).
+`Next.js` · `FastAPI` · `PostgreSQL + pgvector` · `Redis` · `Celery` · `Groq LLM` · `Supabase Auth` · `Docker`
 
 ---
+
+## Features
+
+- **Intent classification** — every email is tagged with a category, urgency,
+  and a confidence score. Low-confidence emails are routed to a human lane
+  rather than guessed.
+- **Knowledge-grounded replies (RAG)** — upload your FAQs, policies, and canned
+  answers; the assistant retrieves the relevant passages and drafts replies
+  grounded in them, with the sources cited.
+- **Streaming drafts** — replies are generated token-by-token in the editor, so
+  agents see the answer compose in real time and can edit before sending.
+- **Rules-based routing** — a visual IF/THEN builder assigns emails to the right
+  teammate by category, urgency, or keyword, with optional CRM logging.
+- **Review-and-send UI** — a triage queue and a two-pane email view with the
+  conversation alongside an editable AI draft and its citations.
+- **Slack notifications** — the right people get pinged the moment an important
+  email is routed.
+- **Analytics & audit** — volume, category mix, median response time, hours
+  saved, and draft-acceptance rate, plus a full audit trail of every action.
+- **Multi-tenant & secure** — organisation-scoped data isolation, encrypted
+  mailbox credentials, and prompt-injection defenses on untrusted email content.
+
+## How it works
+
+```
+   Mailbox (Gmail / Outlook / IMAP)
+        │  new message (poll or webhook)
+        ▼
+   Ingest ──► Classify ──► Route ──┬──► Slack notify
+   (dedupe,   (intent +    (rules →│
+   sanitise)  confidence)  assignee)
+                   └──► Draft reply (retrieves knowledge base, streams to UI)
+        │
+        ▼
+   Review queue → agent edits the draft → one-click Send
+```
+
+Long-running work (classification, embedding, drafting, routing, mailbox sync)
+runs on background workers off the request path, so the UI stays instant and the
+system absorbs morning email bursts.
 
 ## Architecture
 
 ```
-Next.js (App Router, TS, Tailwind)        ← review UI + thin reads
-        │  Authorization: Bearer <Supabase JWT>
+Next.js (App Router, TypeScript, Tailwind)        ← review UI
+        │  authenticated API calls
         ▼
-FastAPI (Python)  ──enqueue──▶  Redis  ──▶  Celery workers (+ Beat poller)
+FastAPI (Python)  ──enqueue──▶  Redis  ──▶  Celery workers
         │                                        │
         └──────────────┬─────────────────────────┘
                        ▼
         PostgreSQL + pgvector  (emails, drafts, classifications,
-                                routing rules, knowledge, jobs, audit log)
+                                routing rules, knowledge, audit log)
 ```
 
-- **Auth/identity:** Supabase (verifies asymmetric **JWKS** tokens, HS256
-  fallback). Users are JIT-provisioned with a personal organisation; every
-  tenant query is org-scoped via `OrgScopedDb`.
-- **LLM:** pluggable wrapper, **Groq** by default (`llama-3.1-8b-instant` for
-  classification, `llama-3.3-70b-versatile` for drafting) with retries,
-  timeouts, structured-output validation, and Langfuse tracing.
-- **Embeddings:** pluggable — `hash` (free, offline, default), `fastembed`
-  (free local), or `openai`. Default vector dim 384.
-
-## Tech stack
-
-Next.js 15 · React 19 · TypeScript · Tailwind · Recharts · FastAPI · Celery ·
-Redis · PostgreSQL + pgvector · Supabase Auth · Groq · Docker Compose.
+- **AI** runs through a single provider-agnostic wrapper with retries, timeouts,
+  structured-output validation, and tracing.
+- **Retrieval** uses pgvector for semantic search over the knowledge base — one
+  database for both relational data and embeddings.
+- **Auth** is handled by Supabase; every database query is scoped to the
+  caller's organisation at the data layer.
 
 ---
 
-## Quick start
+## Getting started
 
 ### Prerequisites
 - Docker + Docker Compose
 - Node.js 20+
-- A free [Supabase](https://supabase.com) project (auth)
+- A free [Supabase](https://supabase.com) project (authentication)
 - A free [Groq](https://console.groq.com) API key (LLM)
 
-### 1. Environment
+### 1. Configure environment
 ```bash
 cp .env.example .env
 cp web/.env.local.example web/.env.local
 ```
-Fill in `.env`:
-- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_JWT_SECRET` (Supabase → Settings → API)
-- `GROQ_API_KEY`
-- `TOKEN_ENCRYPTION_KEY` — generate with:
-  ```bash
-  python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-  ```
-- *(optional)* `SLACK_WEBHOOK_URL` for routing notifications
-
-Mirror `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` into `web/.env.local`.
+Fill in your Supabase keys, Groq API key, and a generated encryption key:
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
 
 ### 2. Start the backend
 ```bash
-docker compose up -d --build           # postgres, redis, api, worker(+beat)
-docker compose exec api python /scripts/migrate.py   # apply migrations
+docker compose up -d --build
+docker compose exec api python /scripts/migrate.py
 ```
 
 ### 3. Start the frontend
 ```bash
 cd web && npm install && npm run dev
 ```
-Open http://localhost:3000 → sign up → you land on the Triage Queue.
+Open http://localhost:3000, create an account, and you're in the triage queue.
 
-### 4. Try it
-- On the queue, click **Seed demo emails** to push sample emails through the
-  full pipeline, or
-- Go to **Settings → Connect a mailbox** to wire a real inbox (see below).
-
----
-
-## Connecting a real mailbox (Gmail via IMAP)
-
-1. Enable **2-Step Verification** on your Google account.
-2. Enable **IMAP** in Gmail → Settings → Forwarding and POP/IMAP.
-3. Create a 16-character **App Password**: https://myaccount.google.com/apppasswords
-4. In the app: **Settings → Connect a mailbox** → host `imap.gmail.com`,
-   port `993`, your address, the app password → **Connect**.
-
-The initial sync pulls recent mail; the Beat poller then ingests new mail every
-60 seconds. Credentials are encrypted at rest (Fernet).
-
-> "Always on" applies while the stack is running. For 24/7, deploy the backend
-> to an always-on host (see roadmap).
+### Connect a mailbox
+In **Settings → Connect a mailbox**, add a Gmail address with an
+[app password](https://myaccount.google.com/apppasswords) (host `imap.gmail.com`,
+port `993`). New mail is then ingested automatically; credentials are encrypted
+at rest.
 
 ---
+
+## Tech stack
+
+| Layer | Choice |
+|------|--------|
+| Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS, Recharts |
+| Backend | FastAPI, Celery, Redis |
+| Database | PostgreSQL + pgvector |
+| AI | Groq (LLM) · pluggable embeddings |
+| Auth | Supabase |
+| Infra | Docker Compose |
 
 ## Project structure
 
 ```
-backend/      FastAPI API + Celery worker + the `triage` package
-  triage/
-    api/            routers (emails, accounts, knowledge, rules, analytics, …)
-    classification/ structured-output intent classification + threshold routing
-    drafting/       RAG-grounded reply generation (+ streaming)
-    knowledge/      chunking, pluggable embeddings, pgvector retrieval
-    routing/        rule engine + Slack/CRM notify
-    ingestion/      Gmail/Graph/IMAP connectors, sanitiser, dedupe, sync
-    llm/            provider-agnostic LLM wrapper (Groq)
-web/          Next.js frontend (the review UI)
-db/migrations SQL migrations (forward-only)
-evals/        labelled eval sets per LLM feature
+backend/      FastAPI API, Celery workers, and the core services
+              (ingestion, classification, knowledge/RAG, drafting, routing)
+web/          Next.js review UI
+db/           database migrations
+evals/        labelled evaluation sets for the AI features
 ```
-
-## Tests
-
-```bash
-docker compose exec api pytest          # unit + DB integration tests
-docker compose exec api python /evals/classification/run_eval.py   # eval set
-```
-
----
-
-## Module status
-
-| # | Module | Status |
-|---|--------|--------|
-| 0 | Foundation (Docker, DB, Redis, LLM wrapper, jobs) | ✅ |
-| 1 | Auth & multi-tenancy | ✅ |
-| 2 | Mailbox ingestion (Gmail/Graph/IMAP, dedupe, sanitise, poller) | ✅ |
-| 3 | Classification + evals | ✅ |
-| 4 | Knowledge base + RAG | ✅ |
-| 5 | Reply drafting (streaming, citations) | ✅ |
-| 6 | Routing engine (rules → assignee + CRM, Slack) | ✅ |
-| 7 | Review UI | ✅ |
-| 8 | Analytics + audit | ✅ |
-| 9 | Hardening & deploy (rate limits, DLQ, PII redaction, retention, deploy) | ⏳ |
-
-### Known follow-ups
-- **Outbound send** currently records the human's send decision (audit + metrics)
-  but does not yet transmit the reply via the provider.
-- **CRM logging** records intent; a real HubSpot/CRM integration is optional
-  (a "Should", not a "Must").
 
 ---
 
 ## License
 
-Portfolio project.
+MIT
