@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AITriage Ops - Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#d1ccff",
+                        "primary": "#3b309e",
+                        "on-primary-fixed": "#140067",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "surface-container": "#e7eefe",
+                        "surface-container-low": "#f0f3ff",
+                        "surface-container-high": "#e2e8f8",
+                        "primary-container": "#534ab7",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "primary-fixed-dim": "#c5c0ff",
+                        "on-background": "#151c27",
+                        "secondary-fixed": "#e1e0ff",
+                        "inverse-primary": "#c5c0ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "primary-fixed": "#e3dfff",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c8c4d5",
+                        "on-surface-variant": "#474553",
+                        "surface": "#f9f9ff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "tertiary": "#683500",
+                        "on-secondary-container": "#fffbff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#dce2f3",
+                        "on-secondary-fixed": "#07006c",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f9f9ff",
+                        "error-container": "#ffdad6",
+                        "background": "#f9f9ff",
+                        "secondary": "#4648d4",
+                        "surface-dim": "#d3daea",
+                        "inverse-surface": "#2a313d",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "secondary-container": "#6063ee",
+                        "on-primary-fixed-variant": "#3f35a3",
+                        "tertiary-fixed": "#ffdcc3",
+                        "on-tertiary-fixed": "#2f1500",
+                        "on-surface": "#151c27",
+                        "surface-variant": "#dce2f3",
+                        "tertiary-container": "#8a4900",
+                        "on-error": "#ffffff",
+                        "outline": "#787584",
+                        "surface-tint": "#584fbc",
+                        "on-tertiary-container": "#ffc69a",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "gutter": "20px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "margin-desktop": "32px",
+                        "unit": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Geist", "sans-serif"],
+                        "code": ["JetBrains Mono", "monospace"],
+                        "body-md": ["Geist", "sans-serif"],
+                        "title-lg": ["Geist", "sans-serif"],
+                        "body-sm": ["Geist", "sans-serif"],
+                        "label-sm": ["Geist", "sans-serif"],
+                        "label-md": ["Geist", "sans-serif"],
+                        "headline-md": ["Geist", "sans-serif"],
+                        "headline-sm": ["Geist", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "code": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Geist Font import placeholder - assuming it's available via system or standard webfont setup, omitting @import for performance but defining fallbacks in tailwind config */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #3b309e;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #3b309e;
+        }
+        .toggle-checkbox:checked + .toggle-label:after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+        .toggle-label:after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md flex min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar (from JSON) -->
+<nav aria-label="Main Navigation" class="fixed left-0 top-0 h-screen w-64 border-r border-outline-variant bg-surface flex flex-col py-md z-10">
+<!-- Header -->
+<div class="px-lg mb-xl flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">AITriage Ops</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">High-Velocity Support</p>
+</div>
+</div>
+<!-- Main Tabs -->
+<ul class="flex flex-col flex-1 px-sm gap-unit">
+<!-- Inactive: Queue -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">inbox</span>
+                    Queue
+                </a>
+</li>
+<!-- Inactive: Rules -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">rule</span>
+                    Rules
+                </a>
+</li>
+<!-- Inactive: Knowledge Base -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+                    Knowledge Base
+                </a>
+</li>
+<!-- Inactive: Analytics -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+                    Analytics
+                </a>
+</li>
+<!-- Active: Settings -->
+<li>
+<a aria-current="page" class="flex items-center gap-md px-md py-sm rounded-lg border-l-2 border-primary bg-surface-container-low text-primary font-bold duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+                    Settings
+                </a>
+</li>
+</ul>
+<!-- Footer Tabs -->
+<ul class="flex flex-col px-sm gap-unit mt-auto pt-md border-t border-outline-variant">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+                    Support
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined">logout</span>
+                    Sign Out
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 p-margin-desktop min-w-0">
+<div class="max-w-4xl mx-auto">
+<header class="mb-xl">
+<h2 class="font-display-lg text-display-lg font-bold text-on-surface">Settings</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Manage your workspace configuration, integrations, and security policies.</p>
+</header>
+<div class="flex flex-col gap-lg">
+<!-- 1. Connect Mailbox Card -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-md">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Mailbox Connection</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-unit">Primary support inbox routed to the triage queue.</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-sm p-md rounded-lg bg-surface-container-low border border-surface-container-high">
+<div class="flex items-center gap-md">
+<div class="flex -space-x-2">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center shrink-0 shadow-sm relative z-20 text-[#EA4335]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mail</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center shrink-0 shadow-sm relative z-10 text-[#0078D4]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">forward_to_inbox</span>
+</div>
+</div>
+<div>
+<div class="flex items-center gap-sm">
+<span class="font-label-md text-label-md text-on-surface font-semibold">support@acmecorp.com</span>
+<span class="inline-flex items-center gap-1 bg-[#E6F4EA] text-[#137333] px-sm py-[2px] rounded-full font-label-sm text-label-sm border border-[#CEEAD6]">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                        Connected
+                                    </span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-unit">Syncing via IMAP • Last checked 2m ago</div>
+</div>
+</div>
+<button class="bg-surface-container-lowest border border-outline text-on-surface rounded-full px-lg py-sm font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+                            Manage Connection
+                        </button>
+</div>
+</section>
+<!-- 2. Knowledge Base Area -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-md">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Knowledge Base Sync</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-unit">Upload documents to improve automated resolution accuracy.</p>
+</div>
+<!-- Upload Zone -->
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center text-center hover:bg-surface-container-low transition-colors cursor-pointer group mt-sm">
+<div class="w-12 h-12 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center mb-md group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+<span class="material-symbols-outlined text-[24px]">cloud_upload</span>
+</div>
+<h4 class="font-label-md text-label-md font-semibold text-on-surface">Click to upload or drag and drop</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-unit">PDF, DOCX, or TXT (max. 10MB)</p>
+</div>
+<!-- File List -->
+<div class="mt-md flex flex-col">
+<h5 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-sm">Uploaded Sources</h5>
+<ul class="flex flex-col border border-surface-variant rounded-lg overflow-hidden">
+<!-- File Item 1 -->
+<li class="flex items-center justify-between p-md border-b border-surface-variant bg-surface-container-lowest hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline">description</span>
+<div>
+<div class="font-label-md text-label-md text-on-surface">Q3_Product_Manual.pdf</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">2.4 MB • Uploaded today</div>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<span class="inline-flex items-center gap-1 text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px] animate-spin">sync</span>
+                                        Syncing
+                                    </span>
+<button aria-label="Delete file" class="text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</li>
+<!-- File Item 2 -->
+<li class="flex items-center justify-between p-md bg-surface-container-lowest hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline">article</span>
+<div>
+<div class="font-label-md text-label-md text-on-surface">Refund_Policy_2024.docx</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">45 KB • Uploaded yesterday</div>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<span class="inline-flex items-center gap-1 text-outline font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                        Synced
+                                    </span>
+<button aria-label="Delete file" class="text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</li>
+</ul>
+</div>
+</section>
+<!-- 3. Privacy Settings Card -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col gap-lg">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Privacy &amp; Security</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-unit">Configure data handling policies for AI processing.</p>
+</div>
+<div class="flex flex-col gap-xl">
+<!-- Toggle -->
+<div class="flex items-center justify-between">
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">PII Redaction</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-unit">Automatically mask personally identifiable information before processing.</div>
+</div>
+<div class="relative inline-block w-10 h-5 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-2 border-outline appearance-none cursor-pointer z-10 top-0 left-0" id="pii_toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-surface-container-high cursor-pointer border border-outline-variant" for="pii_toggle"></label>
+</div>
+</div>
+<!-- Divider -->
+<hr class="border-t border-surface-variant w-full"/>
+<!-- Dropdown -->
+<div class="flex items-center justify-between">
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Data Retention Window</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-unit">How long raw ticket data is stored for model fine-tuning.</div>
+</div>
+<div class="relative w-48">
+<select class="block appearance-none w-full bg-surface-container-lowest border border-outline-variant text-on-surface py-sm px-md pr-xl rounded-lg font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+<option>7 days</option>
+<option>14 days</option>
+<option selected="">30 days</option>
+<option>90 days</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</body></html>

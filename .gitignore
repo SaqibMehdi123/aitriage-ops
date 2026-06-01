@@ -1,0 +1,39 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+.turbo/
+npm-debug.log*
+yarn-error.log*
+
+# --- Env / secrets ---
+.env
+.env.local
+.env.*.local
+*.pem
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Docker / data ---
+pgdata/
+*.log
+
+# --- Misc Office lockfiles ---
+~$*.docx
+
+# Claude Code harness artifacts
+.claude/

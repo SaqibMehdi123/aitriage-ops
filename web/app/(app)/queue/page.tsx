@@ -1,0 +1,181 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { listEmails, ingestEmail } from "@/lib/triage";
+import type { QueueItem } from "@/lib/types";
+import { Avatar, CategoryChip, Confidence, Icon, Spinner, StatusChip, UrgencyBadge } from "@/components/ui";
+
+const CATEGORIES = ["Support", "Sales", "Billing", "Spam", "Other"];
+const URGENCIES = ["high", "normal", "low"];
+const STATUSES = ["new", "classified", "drafted", "review", "sent"];
+
+export default function QueuePage() {
+  const router = useRouter();
+  const [items, setItems] = useState<QueueItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [category, setCategory] = useState("");
+  const [urgency, setUrgency] = useState("");
+  const [status, setStatus] = useState("");
+  const [demoBusy, setDemoBusy] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await listEmails({ category, urgency, status, limit: 100 });
+      setItems(res.items);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load");
+    } finally {
+      setLoading(false);
+    }
+  }, [category, urgency, status]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function seedDemo() {
+    setDemoBusy(true);
+    try {
+      const samples = [
+        { subject: "Login issues on enterprise tier", from_address: "it@acmecorp.com", body: "We can't log in to the enterprise dashboard since this morning — it's urgent, our team is blocked." },
+        { subject: "Interested in Enterprise pricing", from_address: "vp@globex.com", body: "We're a team of 120 evaluating tools for Q3. Could you share Enterprise pricing and SSO details?" },
+        { subject: "Invoice #4092 missing details", from_address: "ap@retailco.com", body: "Our latest invoice seems to be missing line items. Can you resend a corrected copy?" },
+      ];
+      for (const s of samples) {
+        await ingestEmail({ message_id: `demo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, ...s });
+      }
+      // Give the worker a moment to classify/route/draft, then refresh.
+      setTimeout(load, 2500);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Seed failed");
+    } finally {
+      setDemoBusy(false);
+    }
+  }
+
+  const Select = ({ value, onChange, placeholder, options }: {
+    value: string; onChange: (v: string) => void; placeholder: string; options: string[];
+  }) => (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="rounded border border-outline-variant bg-surface-container-lowest px-md py-sm text-label-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary capitalize"
+    >
+      <option value="">{placeholder}</option>
+      {options.map((o) => (
+        <option key={o} value={o} className="capitalize">{o}</option>
+      ))}
+    </select>
+  );
+
+  return (
+    <div className="p-margin-desktop max-w-container-max">
+      <header className="mb-lg flex items-start justify-between">
+        <div>
+          <h1 className="text-display-lg">Triage Queue</h1>
+          <p className="text-body-md text-on-surface-variant">Reviewing incoming support requests.</p>
+        </div>
+        <div className="flex items-center gap-sm">
+          <button
+            onClick={seedDemo}
+            disabled={demoBusy}
+            className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs disabled:opacity-60"
+          >
+            <Icon name="science" className="text-[18px]" />
+            {demoBusy ? "Seeding…" : "Seed demo emails"}
+          </button>
+          <button
+            onClick={load}
+            className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs"
+          >
+            <Icon name="refresh" className="text-[18px]" /> Refresh
+          </button>
+        </div>
+      </header>
+
+      <div className="flex flex-wrap gap-sm mb-md">
+        <Select value={category} onChange={setCategory} placeholder="Category" options={CATEGORIES} />
+        <Select value={urgency} onChange={setUrgency} placeholder="Urgency" options={URGENCIES} />
+        <Select value={status} onChange={setStatus} placeholder="Status" options={STATUSES} />
+      </div>
+
+      {error && (
+        <div className="mb-md rounded-lg border border-error-container bg-error-container text-on-error-container px-md py-sm text-body-sm">
+          {error}
+        </div>
+      )}
+
+      <div className="rounded-xl border border-outline-variant bg-surface-container-lowest overflow-hidden">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="border-b border-outline-variant text-label-sm text-on-surface-variant uppercase tracking-wide">
+              <th className="px-lg py-md font-semibold">Sender</th>
+              <th className="px-lg py-md font-semibold">Subject</th>
+              <th className="px-lg py-md font-semibold">Category</th>
+              <th className="px-lg py-md font-semibold">Urgency</th>
+              <th className="px-lg py-md font-semibold">AI Confidence</th>
+              <th className="px-lg py-md font-semibold">Status</th>
+              <th className="px-lg py-md font-semibold">Assignee</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((it) => (
+              <tr
+                key={it.id}
+                onClick={() => router.push(`/emails/${it.id}`)}
+                className="border-b border-surface-container-high last:border-0 hover:bg-surface-container-low cursor-pointer transition-colors"
+              >
+                <td className="px-lg py-md">
+                  <div className="flex items-center gap-sm">
+                    <Avatar name={it.from_address} className="w-8 h-8" />
+                    <span className="text-body-sm text-on-surface truncate max-w-[160px]">{it.from_address}</span>
+                  </div>
+                </td>
+                <td className="px-lg py-md">
+                  <div className="flex items-center gap-sm">
+                    <span className="text-body-sm text-on-surface truncate max-w-[280px]">{it.subject || "(no subject)"}</span>
+                    {it.has_draft && (
+                      <span className="inline-flex items-center gap-xs text-label-sm text-primary">
+                        <Icon name="auto_awesome" className="text-[14px]" /> draft
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td className="px-lg py-md"><CategoryChip category={it.category} /></td>
+                <td className="px-lg py-md"><UrgencyBadge urgency={it.urgency} /></td>
+                <td className="px-lg py-md"><Confidence value={it.confidence} /></td>
+                <td className="px-lg py-md"><StatusChip status={it.status} /></td>
+                <td className="px-lg py-md">
+                  {it.assignee_name ? (
+                    <div className="flex items-center gap-xs">
+                      <Avatar name={it.assignee_name} className="w-7 h-7" />
+                      <span className="text-body-sm text-on-surface-variant truncate max-w-[120px]">{it.assignee_name}</span>
+                    </div>
+                  ) : (
+                    <span className="text-on-surface-variant text-label-sm">Unassigned</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {loading && <div className="px-lg py-xl flex justify-center"><Spinner label="Loading queue…" /></div>}
+
+        {!loading && items.length === 0 && (
+          <div className="px-lg py-xl flex flex-col items-center text-center gap-xs">
+            <Icon name="done_all" className="text-[32px] text-on-surface-variant" />
+            <p className="text-headline-sm">All caught up</p>
+            <p className="text-body-sm text-on-surface-variant">
+              No items match your current filters. Use <em>Seed demo emails</em> to try the pipeline.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

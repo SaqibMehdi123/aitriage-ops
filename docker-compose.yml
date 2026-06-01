@@ -1,0 +1,78 @@
+# Backend stack for local development.
+# Postgres (with pgvector), Redis, the FastAPI API, and the Celery worker all
+# run as Linux containers so the queue's fork-based concurrency works on any
+# host OS (Windows/macOS/Linux). The Next.js frontend runs separately on the
+# host via `npm run dev` for fast iteration.
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: triage_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-triage}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-triage_dev_pw}
+      POSTGRES_DB: ${POSTGRES_DB:-triage}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-triage} -d ${POSTGRES_DB:-triage}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: triage_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+    container_name: triage_api
+    command: uvicorn triage.api.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://${POSTGRES_USER:-triage}:${POSTGRES_PASSWORD:-triage_dev_pw}@postgres:5432/${POSTGRES_DB:-triage}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./db:/db            # migrations available inside the container
+      - ./scripts:/scripts  # migration runner
+      - ./evals:/evals      # eval datasets + runners
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+    container_name: triage_worker
+    # -B runs the Beat scheduler in-process for periodic mailbox polling.
+    command: celery -A triage.worker.celery_app.celery worker -B -s /tmp/celerybeat-schedule --loglevel=INFO --concurrency=2
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://${POSTGRES_USER:-triage}:${POSTGRES_PASSWORD:-triage_dev_pw}@postgres:5432/${POSTGRES_DB:-triage}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:

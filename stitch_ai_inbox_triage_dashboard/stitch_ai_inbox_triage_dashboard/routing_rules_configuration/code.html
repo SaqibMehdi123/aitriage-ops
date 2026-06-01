@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AITriage Ops - Routing Rules</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#d1ccff",
+                        "primary": "#3b309e",
+                        "on-primary-fixed": "#140067",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "surface-container": "#e7eefe",
+                        "surface-container-low": "#f0f3ff",
+                        "surface-container-high": "#e2e8f8",
+                        "primary-container": "#534ab7",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "primary-fixed-dim": "#c5c0ff",
+                        "on-background": "#151c27",
+                        "secondary-fixed": "#e1e0ff",
+                        "inverse-primary": "#c5c0ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "primary-fixed": "#e3dfff",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c8c4d5",
+                        "on-surface-variant": "#474553",
+                        "surface": "#f9f9ff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "tertiary": "#683500",
+                        "on-secondary-container": "#fffbff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#dce2f3",
+                        "on-secondary-fixed": "#07006c",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f9f9ff",
+                        "error-container": "#ffdad6",
+                        "background": "#f9f9ff",
+                        "secondary": "#4648d4",
+                        "surface-dim": "#d3daea",
+                        "inverse-surface": "#2a313d",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "secondary-container": "#6063ee",
+                        "on-primary-fixed-variant": "#3f35a3",
+                        "tertiary-fixed": "#ffdcc3",
+                        "on-tertiary-fixed": "#2f1500",
+                        "on-surface": "#151c27",
+                        "surface-variant": "#dce2f3",
+                        "tertiary-container": "#8a4900",
+                        "on-error": "#ffffff",
+                        "outline": "#787584",
+                        "surface-tint": "#584fbc",
+                        "on-tertiary-container": "#ffc69a",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "gutter": "20px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "margin-desktop": "32px",
+                        "unit": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Geist"],
+                        "code": ["JetBrains Mono"],
+                        "body-md": ["Geist"],
+                        "title-lg": ["Geist"],
+                        "body-sm": ["Geist"],
+                        "label-sm": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "headline-sm": ["Geist"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "code": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .rule-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .rule-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+        }
+        .drag-handle {
+            cursor: grab;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 300ms ease-out, transform 300ms ease-out;
+        }
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 200ms ease-in, transform 200ms ease-in;
+        }
+        .logic-connector {
+            position: relative;
+        }
+        .logic-connector::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 24px;
+            bottom: -24px;
+            width: 2px;
+            background-color: #E5E7EB;
+            z-index: 0;
+        }
+        .logic-connector:last-child::before {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased overflow-hidden">
+<!-- Top Navigation (Mobile primarily, hidden on md+) -->
+<nav class="md:hidden flex justify-between items-center px-margin-mobile w-full h-16 bg-surface dark:bg-background border-b border-outline-variant dark:border-outline">
+<div class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed">AITriage</div>
+<div class="flex items-center gap-4 text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined cursor-pointer" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer" data-icon="help">help</span>
+</div>
+</nav>
+<div class="flex h-[calc(100vh-64px)] md:h-screen">
+<!-- Sidebar Navigation (Desktop) -->
+<nav class="hidden md:flex flex-col h-full py-md w-64 border-r fixed left-0 top-0 bg-surface dark:bg-background border-r border-outline-variant dark:border-outline">
+<div class="px-md mb-8">
+<div class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">AITriage Ops</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant mt-1">High-Velocity Support</div>
+</div>
+<ul class="flex flex-col gap-1 flex-1 px-sm">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="inbox">inbox</span>
+                        Queue
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg border-l-2 border-primary bg-surface-container-low text-primary dark:bg-surface-container-highest dark:text-primary-fixed font-bold hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="rule" data-weight="fill" style="font-variation-settings: 'FILL' 1;">rule</span>
+                        Rules
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="auto_stories">auto_stories</span>
+                        Knowledge Base
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+                        Analytics
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                        Settings
+                    </a>
+</li>
+</ul>
+<div class="mt-auto px-sm flex flex-col gap-1 border-t border-outline-variant dark:border-outline pt-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
+                    Support
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                    Sign Out
+                </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 overflow-y-auto bg-surface-container-low min-h-full">
+<div class="max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop py-lg md:py-xl">
+<!-- Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-background">Routing Rules</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Manage automated triaging and assignment workflows.</p>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-container transition-colors shadow-sm" id="addRuleBtn">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                        Add Rule
+                    </button>
+</div>
+<!-- Rules List (Draggable Cards) -->
+<div class="flex flex-col gap-3">
+<!-- Rule Card 1 -->
+<div class="rule-card bg-surface border border-outline-variant rounded-xl p-4 flex items-center gap-4 group">
+<div class="drag-handle text-outline hover:text-on-surface-variant transition-colors p-1">
+<span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex-1 flex flex-wrap items-center gap-y-2 gap-x-2">
+<span class="font-label-sm text-label-sm text-outline px-2 py-1 bg-surface-container rounded-DEFAULT">IF</span>
+<span class="font-body-sm text-body-sm px-2 py-1 bg-surface-container-high rounded-lg border border-outline-variant">category</span>
+<span class="font-code text-code text-on-surface-variant">=</span>
+<span class="font-label-md text-label-md text-primary bg-primary-container/10 border border-primary/20 px-2 py-1 rounded-lg">Support</span>
+<span class="font-label-sm text-label-sm text-outline px-2 py-1 bg-surface-container rounded-DEFAULT ml-2">AND</span>
+<span class="font-body-sm text-body-sm px-2 py-1 bg-surface-container-high rounded-lg border border-outline-variant">urgency</span>
+<span class="font-code text-code text-on-surface-variant">=</span>
+<span class="font-label-md text-label-md text-error bg-error-container/30 border border-error/20 px-2 py-1 rounded-lg">High</span>
+<span class="font-label-sm text-label-sm text-outline px-2 py-1 bg-surface-container rounded-DEFAULT ml-2">THEN</span>
+<span class="flex items-center gap-1 font-body-sm text-body-sm px-2 py-1 bg-secondary-container/10 border border-secondary/20 text-secondary rounded-lg">
+<span class="material-symbols-outlined text-[14px]" data-icon="person_add">person_add</span>
+                                Assign to Sarah
+                            </span>
+<span class="flex items-center gap-1 font-body-sm text-body-sm px-2 py-1 bg-surface-container-highest border border-outline-variant text-on-surface rounded-lg">
+<span class="material-symbols-outlined text-[14px]" data-icon="list_alt">list_alt</span>
+                                Log to CRM
+                            </span>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-2 mr-4">
+<span class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-1 rounded-full hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="text-on-surface-variant hover:text-error transition-colors p-1 rounded-full hover:bg-error-container">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Rule Card 2 -->
+<div class="rule-card bg-surface border border-outline-variant rounded-xl p-4 flex items-center gap-4 group">
+<div class="drag-handle text-outline hover:text-on-surface-variant transition-colors p-1">
+<span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex-1 flex flex-wrap items-center gap-y-2 gap-x-2">
+<span class="font-label-sm text-label-sm text-outline px-2 py-1 bg-surface-container rounded-DEFAULT">IF</span>
+<span class="font-body-sm text-body-sm px-2 py-1 bg-surface-container-high rounded-lg border border-outline-variant">sentiment</span>
+<span class="font-code text-code text-on-surface-variant">=</span>
+<span class="font-label-md text-label-md text-on-surface bg-surface-container-highest border border-outline-variant px-2 py-1 rounded-lg">Negative</span>
+<span class="font-label-sm text-label-sm text-outline px-2 py-1 bg-surface-container rounded-DEFAULT ml-2">THEN</span>
+<span class="flex items-center gap-1 font-body-sm text-body-sm px-2 py-1 bg-secondary-container/10 border border-secondary/20 text-secondary rounded-lg">
+<span class="material-symbols-outlined text-[14px]" data-icon="escalator_warning">escalator_warning</span>
+                                Escalate to Manager
+                            </span>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-2 mr-4">
+<span class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-1 rounded-full hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="text-on-surface-variant hover:text-error transition-colors p-1 rounded-full hover:bg-error-container">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Rule Card 3 -->
+<div class="rule-card bg-surface border border-outline-variant rounded-xl p-4 flex items-center gap-4 group opacity-60">
+<div class="drag-handle text-outline hover:text-on-surface-variant transition-colors p-1">
+<span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex-1 flex flex-wrap items-center gap-y-2 gap-x-2">
+<span class="font-label-sm text-label-sm text-outline px-2 py-1 bg-surface-container rounded-DEFAULT">IF</span>
+<span class="font-body-sm text-body-sm px-2 py-1 bg-surface-container-high rounded-lg border border-outline-variant">keyword</span>
+<span class="font-code text-code text-on-surface-variant">contains</span>
+<span class="font-label-md text-label-md text-on-surface bg-surface-container-highest border border-outline-variant px-2 py-1 rounded-lg">"billing"</span>
+<span class="font-label-sm text-label-sm text-outline px-2 py-1 bg-surface-container rounded-DEFAULT ml-2">THEN</span>
+<span class="flex items-center gap-1 font-body-sm text-body-sm px-2 py-1 bg-secondary-container/10 border border-secondary/20 text-secondary rounded-lg">
+<span class="material-symbols-outlined text-[14px]" data-icon="payments">payments</span>
+                                Route to Finance
+                            </span>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-2 mr-4">
+<span class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-1 rounded-full hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="text-on-surface-variant hover:text-error transition-colors p-1 rounded-full hover:bg-error-container">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Rule Builder Modal Overlay (Hidden by default) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center hidden bg-inverse-surface/40 backdrop-blur-sm" id="ruleModal">
+<div class="bg-surface rounded-xl shadow-lg w-full max-w-2xl mx-margin-mobile md:mx-0 border border-outline-variant flex flex-col max-h-[921px]">
+<!-- Modal Header -->
+<div class="flex justify-between items-center p-6 border-b border-outline-variant">
+<h2 class="font-title-lg text-title-lg text-on-surface font-semibold">Create Routing Rule</h2>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors" id="closeModalBtn">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Modal Body (Rule Builder) -->
+<div class="p-6 overflow-y-auto flex-1 flex flex-col gap-6">
+<!-- Rule Name -->
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Rule Name</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 font-body-sm text-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" placeholder="e.g., High Priority Support" type="text"/>
+</div>
+<!-- Conditions Area -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4">
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase tracking-wider">Conditions</div>
+<div class="flex flex-col gap-4">
+<!-- Condition Row 1 -->
+<div class="logic-connector flex items-start gap-3 relative z-10">
+<div class="mt-1 font-label-sm text-label-sm text-outline px-2 py-1 bg-surface-container rounded-DEFAULT shadow-sm">IF</div>
+<div class="flex-1 grid grid-cols-3 gap-2">
+<select class="bg-surface border border-outline-variant rounded-lg px-2 py-1.5 font-body-sm text-body-sm focus:outline-none focus:border-primary">
+<option>category</option>
+<option>urgency</option>
+<option>sentiment</option>
+<option>keyword</option>
+</select>
+<select class="bg-surface border border-outline-variant rounded-lg px-2 py-1.5 font-body-sm text-body-sm focus:outline-none focus:border-primary">
+<option>Equals (=)</option>
+<option>Not Equals (!=)</option>
+<option>Contains</option>
+</select>
+<input class="bg-surface border border-outline-variant rounded-lg px-2 py-1.5 font-body-sm text-body-sm focus:outline-none focus:border-primary" placeholder="Value..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-error mt-1">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Condition Row 2 -->
+<div class="logic-connector flex items-start gap-3 relative z-10">
+<select class="mt-1 font-label-sm text-label-sm text-on-surface px-1 py-1 bg-surface-container-high border border-outline-variant rounded-DEFAULT focus:outline-none cursor-pointer">
+<option>AND</option>
+<option>OR</option>
+</select>
+<div class="flex-1 grid grid-cols-3 gap-2">
+<select class="bg-surface border border-outline-variant rounded-lg px-2 py-1.5 font-body-sm text-body-sm focus:outline-none focus:border-primary">
+<option>urgency</option>
+<option>category</option>
+<option>sentiment</option>
+</select>
+<select class="bg-surface border border-outline-variant rounded-lg px-2 py-1.5 font-body-sm text-body-sm focus:outline-none focus:border-primary">
+<option>Equals (=)</option>
+<option>Greater Than (&gt;)</option>
+</select>
+<select class="bg-surface border border-outline-variant rounded-lg px-2 py-1.5 font-body-sm text-body-sm focus:outline-none focus:border-primary">
+<option>High</option>
+<option>Medium</option>
+<option>Low</option>
+</select>
+</div>
+<button class="text-on-surface-variant hover:text-error mt-1">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<!-- Add Condition Action -->
+<div class="ml-10 mt-2">
+<button class="text-primary font-label-sm text-label-sm flex items-center gap-1 hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span>
+                                Add Condition
+                            </button>
+</div>
+</div>
+</div>
+<!-- Actions Area -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-4">
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase tracking-wider">Actions</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-start gap-3">
+<div class="mt-1 font-label-sm text-label-sm text-outline px-2 py-1 bg-surface-container rounded-DEFAULT shadow-sm">THEN</div>
+<div class="flex-1 grid grid-cols-2 gap-2">
+<select class="bg-surface border border-outline-variant rounded-lg px-2 py-1.5 font-body-sm text-body-sm focus:outline-none focus:border-primary">
+<option>Assign to User</option>
+<option>Route to Queue</option>
+<option>Add Tag</option>
+<option>Log to CRM</option>
+</select>
+<select class="bg-surface border border-outline-variant rounded-lg px-2 py-1.5 font-body-sm text-body-sm focus:outline-none focus:border-primary">
+<option>Sarah Connor</option>
+<option>John Doe</option>
+<option>Unassigned</option>
+</select>
+</div>
+<button class="text-on-surface-variant hover:text-error mt-1 opacity-0 pointer-events-none">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<div class="ml-12 mt-1">
+<button class="text-primary font-label-sm text-label-sm flex items-center gap-1 hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span>
+                                Add Action
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="p-4 border-t border-outline-variant flex justify-end gap-3 bg-surface-container-lowest rounded-b-xl">
+<button class="px-4 py-2 font-label-md text-label-md border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container-low transition-colors bg-surface" id="cancelModalBtn">
+                    Cancel
+                </button>
+<button class="px-4 py-2 font-label-md text-label-md bg-primary text-on-primary rounded-lg hover:bg-primary-container transition-colors shadow-sm">
+                    Save Rule
+                </button>
+</div>
+</div>
+</div>
+<script>
+        // Simple modal toggle logic
+        const modal = document.getElementById('ruleModal');
+        const openBtn = document.getElementById('addRuleBtn');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelModalBtn');
+
+        function openModal() {
+            modal.classList.remove('hidden');
+            // Small delay to allow display:block to apply before animating opacity
+            setTimeout(() => {
+                modal.firstElementChild.classList.add('modal-enter-active');
+            }, 10);
+        }
+
+        function closeModal() {
+            modal.firstElementChild.classList.remove('modal-enter-active');
+            modal.classList.add('hidden');
+        }
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Close on backdrop click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
+</body></html>

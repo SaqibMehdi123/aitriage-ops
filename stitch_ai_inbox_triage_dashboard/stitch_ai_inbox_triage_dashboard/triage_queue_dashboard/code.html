@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Triage Queue - AITriage</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-container": "#d1ccff",
+                      "primary": "#3b309e",
+                      "on-primary-fixed": "#140067",
+                      "on-secondary-fixed-variant": "#2f2ebe",
+                      "surface-container": "#e7eefe",
+                      "surface-container-low": "#f0f3ff",
+                      "surface-container-high": "#e2e8f8",
+                      "primary-container": "#534ab7",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed-dim": "#c0c1ff",
+                      "primary-fixed-dim": "#c5c0ff",
+                      "on-background": "#151c27",
+                      "secondary-fixed": "#e1e0ff",
+                      "inverse-primary": "#c5c0ff",
+                      "on-secondary": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb77d",
+                      "primary-fixed": "#e3dfff",
+                      "error": "#ba1a1a",
+                      "outline-variant": "#c8c4d5",
+                      "on-surface-variant": "#474553",
+                      "surface": "#f9f9ff",
+                      "inverse-on-surface": "#ebf1ff",
+                      "tertiary": "#683500",
+                      "on-secondary-container": "#fffbff",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-highest": "#dce2f3",
+                      "on-secondary-fixed": "#07006c",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#f9f9ff",
+                      "error-container": "#ffdad6",
+                      "background": "#f9f9ff",
+                      "secondary": "#4648d4",
+                      "surface-dim": "#d3daea",
+                      "inverse-surface": "#2a313d",
+                      "on-tertiary-fixed-variant": "#6e3900",
+                      "secondary-container": "#6063ee",
+                      "on-primary-fixed-variant": "#3f35a3",
+                      "tertiary-fixed": "#ffdcc3",
+                      "on-tertiary-fixed": "#2f1500",
+                      "on-surface": "#151c27",
+                      "surface-variant": "#dce2f3",
+                      "tertiary-container": "#8a4900",
+                      "on-error": "#ffffff",
+                      "outline": "#787584",
+                      "surface-tint": "#584fbc",
+                      "on-tertiary-container": "#ffc69a",
+                      "on-error-container": "#93000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "gutter": "20px",
+                      "md": "16px",
+                      "margin-mobile": "16px",
+                      "xs": "4px",
+                      "margin-desktop": "32px",
+                      "unit": "4px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "container-max": "1440px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "code": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "title-lg": [
+                              "Geist"
+                      ],
+                      "body-sm": [
+                              "Geist"
+                      ],
+                      "label-sm": [
+                              "Geist"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "headline-sm": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "code": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-surface');
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- TopNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface flex justify-between items-center px-margin-mobile w-full h-16 border-b border-outline-variant fixed top-0 left-0 z-50">
+<div class="font-display-lg text-display-lg font-bold text-primary">AITriage</div>
+<div class="flex gap-md">
+<span class="material-symbols-outlined cursor-pointer hover:opacity-80 transition-opacity text-on-surface-variant">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:opacity-80 transition-opacity text-on-surface-variant">help</span>
+</div>
+</nav>
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex flex-col h-full py-md w-64 border-r fixed left-0 top-0 bg-surface border-outline-variant">
+<div class="px-md mb-xl flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-sm">support_agent</span>
+</div>
+<div>
+<div class="font-headline-sm text-headline-sm font-bold text-primary">AITriage Ops</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant">High-Velocity Support</div>
+</div>
+</div>
+<nav class="flex-1 px-sm">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg border-l-2 border-primary bg-surface-container-low text-primary font-bold transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inbox</span>
+<span class="font-label-md text-label-md">Queue</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors border-l-2 border-transparent hover:border-outline-variant" href="#">
+<span class="material-symbols-outlined">rule</span>
+<span class="font-label-md text-label-md">Rules</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors border-l-2 border-transparent hover:border-outline-variant" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-label-md text-label-md">Knowledge Base</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors border-l-2 border-transparent hover:border-outline-variant" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors border-l-2 border-transparent hover:border-outline-variant" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="px-sm mt-auto border-t border-outline-variant pt-md">
+<ul class="space-y-xs">
+<li>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors border-l-2 border-transparent hover:border-outline-variant" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors border-l-2 border-transparent hover:border-outline-variant" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Sign Out</span>
+</a>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 pt-16 md:pt-0 p-margin-mobile md:p-margin-desktop bg-background min-h-screen">
+<!-- Header -->
+<header class="flex justify-between items-center mb-lg">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Triage Queue</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Reviewing incoming support requests.</p>
+</div>
+<button class="flex items-center gap-xs px-md py-sm bg-surface border border-outline-variant rounded-lg text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">refresh</span>
+                Refresh
+            </button>
+</header>
+<!-- Filters -->
+<div class="flex gap-sm mb-lg overflow-x-auto pb-xs">
+<select class="form-select border-outline-variant rounded-lg text-body-sm py-sm pl-md pr-xl bg-surface focus:ring-2 focus:ring-primary focus:border-primary">
+<option disabled="" selected="" value="">Category</option>
+<option value="support">Support</option>
+<option value="sales">Sales</option>
+<option value="billing">Billing</option>
+<option value="spam">Spam</option>
+</select>
+<select class="form-select border-outline-variant rounded-lg text-body-sm py-sm pl-md pr-xl bg-surface focus:ring-2 focus:ring-primary focus:border-primary">
+<option disabled="" selected="" value="">Urgency</option>
+<option value="high">High</option>
+<option value="medium">Medium</option>
+<option value="low">Low</option>
+</select>
+<select class="form-select border-outline-variant rounded-lg text-body-sm py-sm pl-md pr-xl bg-surface focus:ring-2 focus:ring-primary focus:border-primary">
+<option disabled="" selected="" value="">Status</option>
+<option value="pending">Pending</option>
+<option value="reviewed">Reviewed</option>
+</select>
+</div>
+<!-- Data Table -->
+<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Sender</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Subject</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Category</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Urgency</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">AI Confidence</th>
+<th class="px-md py-sm font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Assignee</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- High Confidence Row -->
+<tr class="hover:bg-surface-container-lowest transition-colors group cursor-pointer">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label-md text-label-md font-bold">
+                                        AC
+                                    </div>
+<span class="font-body-sm text-body-sm font-medium text-on-surface">Acme Corp</span>
+</div>
+</td>
+<td class="px-md py-md font-body-sm text-body-sm text-on-surface max-w-xs truncate">Login issues on enterprise tier</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary-container/20 text-on-secondary-container">Support</span>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">High</span>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<span class="font-code text-code text-on-surface">98%</span>
+</td>
+<td class="px-md py-md text-right flex justify-end">
+<div class="w-6 h-6 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-label-sm text-label-sm" title="Alex D.">
+                                    AD
+                                </div>
+</td>
+</tr>
+<!-- Requires Review Row (Low Confidence) -->
+<tr class="hover:bg-surface-container-lowest transition-colors group cursor-pointer bg-error-container/10 border-l-2 border-error">
+<td class="px-md py-md pl-[14px]"> <!-- Adjust padding to account for border -->
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-dim text-on-surface-variant flex items-center justify-center font-label-md text-label-md font-bold">
+                                        JD
+                                    </div>
+<span class="font-body-sm text-body-sm font-medium text-on-surface">Jane Doe</span>
+</div>
+</td>
+<td class="px-md py-md font-body-sm text-body-sm text-on-surface max-w-xs truncate flex items-center gap-sm">
+                                Feature request: Custom integrations
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-error text-on-error uppercase tracking-wider">Requires Review</span>
+</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-tertiary-container/20 text-on-tertiary-container">Sales</span>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-[#EAB308]"></span> <!-- Using a specific hex for yellow warning if not in theme -->
+<span class="font-body-sm text-body-sm text-on-surface-variant">Medium</span>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<span class="font-code text-code text-error font-bold">64%</span>
+</td>
+<td class="px-md py-md text-right flex justify-end">
+<span class="material-symbols-outlined text-on-surface-variant opacity-50" title="Unassigned">person_off</span>
+</td>
+</tr>
+<!-- Standard Row -->
+<tr class="hover:bg-surface-container-lowest transition-colors group cursor-pointer">
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-md text-label-md font-bold">
+                                        B
+                                    </div>
+<span class="font-body-sm text-body-sm font-medium text-on-surface">Bob Smith</span>
+</div>
+</td>
+<td class="px-md py-md font-body-sm text-body-sm text-on-surface max-w-xs truncate">Invoice #4092 missing details</td>
+<td class="px-md py-md">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-outline-variant/30 text-on-surface-variant">Billing</span>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Low</span>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<span class="font-code text-code text-on-surface">92%</span>
+</td>
+<td class="px-md py-md text-right flex justify-end">
+<div class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-sm text-label-sm" title="System Auto">
+<span class="material-symbols-outlined text-[12px]">smart_toy</span>
+</div>
+</td>
+</tr>
+<!-- Loading Skeletons -->
+<tr class="animate-pulse">
+<td class="px-md py-md"><div class="flex items-center gap-sm"><div class="w-8 h-8 rounded-full bg-surface-variant"></div><div class="h-4 w-24 bg-surface-variant rounded"></div></div></td>
+<td class="px-md py-md"><div class="h-4 w-48 bg-surface-variant rounded"></div></td>
+<td class="px-md py-md"><div class="h-6 w-16 bg-surface-variant rounded-full"></div></td>
+<td class="px-md py-md"><div class="flex items-center gap-xs"><div class="w-2 h-2 rounded-full bg-surface-variant"></div><div class="h-4 w-12 bg-surface-variant rounded"></div></div></td>
+<td class="px-md py-md text-right"><div class="h-4 w-8 bg-surface-variant rounded ml-auto"></div></td>
+<td class="px-md py-md text-right"><div class="w-6 h-6 rounded-full bg-surface-variant ml-auto"></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Empty State / End of list -->
+<div class="p-xl text-center border-t border-outline-variant bg-surface-container-lowest">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-sm block opacity-50">done_all</span>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-xs">All caught up</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">No more items matching your current filters.</p>
+</div>
+</div>
+</main>
+</body></html>
