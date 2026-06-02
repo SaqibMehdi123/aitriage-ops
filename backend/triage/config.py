@@ -86,6 +86,13 @@ class Settings(BaseSettings):
     # Optional Slack Incoming Webhook URL; routing notifications fire here when set.
     slack_webhook_url: str = ""
 
+    # --- CRM logging ("Send & log to CRM") ---
+    # webhook: POST the interaction to any URL (HubSpot/Zapier/Make/webhook.site).
+    # hubspot: native — upsert the contact + attach a note (needs hubspot_token).
+    crm_provider: Literal["none", "webhook", "hubspot"] = "none"
+    crm_webhook_url: str = ""
+    hubspot_token: str = ""
+
     # --- Analytics (Module 8) ---
     # Estimated minutes of manual triage+drafting saved per AI-handled email,
     # used for the "hours saved" headline metric.

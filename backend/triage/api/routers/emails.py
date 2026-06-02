@@ -322,6 +322,9 @@ def send_email(email_id: str, body: SendIn, ctx: AuthContext = Depends(get_auth_
         ).fetchone()
         if not draft:
             raise HTTPException(status_code=400, detail="No draft to send for this email.")
+        cls = conn.execute(
+            "SELECT category FROM classifications WHERE email_id=%s AND deleted_at IS NULL", (email_id,),
+        ).fetchone()
 
     final_body = body.body if body.body is not None else draft["body"]
     was_edited = body.body is not None and body.body.strip() != (draft["body"] or "").strip()
@@ -348,6 +351,18 @@ def send_email(email_id: str, body: SendIn, ctx: AuthContext = Depends(get_auth_
             except Exception as exc:
                 raise HTTPException(status_code=502, detail=f"Failed to deliver email: {exc}")
 
+    # Log the interaction to the CRM if requested (best-effort; never blocks send).
+    crm_logged = False
+    if body.log_to_crm:
+        from ...crm import log_interaction
+
+        crm_logged = log_interaction(
+            contact_email=email["from_address"],
+            subject=email["subject"],
+            category=cls["category"] if cls else None,
+            reply_body=final_body,
+        )
+
     with connection() as conn, conn.transaction():
         conn.execute(
             "UPDATE drafts SET body=%s, status='sent', was_edited=%s, sent_by=%s, sent_at=now() WHERE id=%s",
@@ -359,6 +374,6 @@ def send_email(email_id: str, body: SendIn, ctx: AuthContext = Depends(get_auth_
             "INSERT INTO audit_logs (organization_id, actor_id, action, entity) VALUES (%s,%s,'sent',%s)",
             (ctx.organization_id, ctx.user_id,
              _json.dumps({"type": "email", "id": email_id, "draft_id": str(draft["id"]),
-                          "log_to_crm": body.log_to_crm, "delivered": delivered})),
+                          "log_to_crm": body.log_to_crm, "crm_logged": crm_logged, "delivered": delivered})),
         )
-    return {"status": "sent", "email_id": email_id, "logged_to_crm": body.log_to_crm, "delivered": delivered}
+    return {"status": "sent", "email_id": email_id, "logged_to_crm": crm_logged, "delivered": delivered}
