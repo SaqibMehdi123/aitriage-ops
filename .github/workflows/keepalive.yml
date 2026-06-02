@@ -1,0 +1,27 @@
+# Keeps the free Render web service awake by pinging its health endpoint.
+# Set a repository VARIABLE named KEEPALIVE_URL to your Render health URL, e.g.
+#   https://triage-api-xxxx.onrender.com/health
+# (GitHub → repo → Settings → Secrets and variables → Actions → Variables → New)
+#
+# Note: GitHub's scheduled runs are best-effort (often 5–15 min late) and are
+# auto-disabled after ~60 days of repo inactivity. For rock-solid uptime, also
+# use an external pinger (UptimeRobot / cron-job.org) as described in DEPLOY.md.
+name: keep-alive
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          if [ -z "${{ vars.KEEPALIVE_URL }}" ]; then
+            echo "KEEPALIVE_URL repo variable not set — skipping."
+            exit 0
+          fi
+          echo "Pinging ${{ vars.KEEPALIVE_URL }}"
+          curl -fsS --max-time 60 "${{ vars.KEEPALIVE_URL }}" && echo " — ok" || echo " — ping failed (service may be waking)"
