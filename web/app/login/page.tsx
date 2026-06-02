@@ -5,14 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Icon, Logo } from "@/components/ui";
 
-const FEATURES = [
-  { icon: "bolt", title: "Instant triage", desc: "Every email classified by intent, urgency, and confidence." },
-  { icon: "auto_awesome", title: "Grounded AI replies", desc: "Drafts written from your own knowledge base, with citations." },
-  { icon: "alt_route", title: "Smart routing", desc: "Rules send each message to the right person, automatically." },
-];
-
-const PANEL_GRADIENT = "linear-gradient(150deg,#2f2ebe 0%,#3b309e 45%,#534ab7 100%)";
-const BTN_GRADIENT = "linear-gradient(135deg,#6d63e6 0%,#3b309e 100%)";
+const PAGE_GRADIENT = "linear-gradient(135deg,#1e1b4b 0%,#3b2f8f 45%,#6d28d9 100%)";
+const BTN_GRADIENT = "linear-gradient(135deg,#6366f1 0%,#7c3aed 100%)";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,134 +48,90 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen grid lg:grid-cols-2 bg-surface-container-low">
-      {/* Brand panel */}
-      <aside
-        className="relative hidden lg:flex flex-col justify-between p-xl text-white overflow-hidden"
-        style={{ background: PANEL_GRADIENT }}
-      >
-        {/* soft decorative glow */}
-        <div className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle,#c5c0ff,transparent 70%)" }} />
-        <div className="pointer-events-none absolute -bottom-32 -left-16 w-96 h-96 rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle,#6063ee,transparent 70%)" }} />
+    <main
+      className="min-h-screen flex items-center justify-center px-margin-mobile py-xl relative overflow-hidden"
+      style={{ background: PAGE_GRADIENT }}
+    >
+      {/* decorative glows */}
+      <div className="pointer-events-none absolute -top-40 -left-40 w-[28rem] h-[28rem] rounded-full opacity-30"
+        style={{ background: "radial-gradient(circle,#a78bfa,transparent 70%)" }} />
+      <div className="pointer-events-none absolute -bottom-48 -right-40 w-[32rem] h-[32rem] rounded-full opacity-25"
+        style={{ background: "radial-gradient(circle,#6366f1,transparent 70%)" }} />
 
-        <div className="relative flex items-center gap-sm">
-          <Logo size={40} />
-          <div>
-            <h1 className="text-headline-sm font-bold leading-tight">AITriage Ops</h1>
-            <p className="text-label-sm text-white/70">High-Velocity Support</p>
-          </div>
+      <div className="relative w-full max-w-[26rem]">
+        {/* Brand */}
+        <div className="flex flex-col items-center text-center mb-lg">
+          <Logo size={56} className="mb-md" />
+          <h1 className="text-headline-md font-bold tracking-tight text-white">
+            AITriage <span className="text-white/70 font-light">Ops</span>
+          </h1>
+          <p className="text-body-sm text-white/60 mt-unit">AI inbox triage &amp; reply router</p>
         </div>
 
-        <div className="relative max-w-md">
-          <h2 className="text-display-lg font-semibold leading-tight mb-md">
-            Triage your inbox at the speed of AI.
+        {/* Card */}
+        <div className="rounded-2xl bg-white/95 backdrop-blur-sm border border-white/40 shadow-2xl p-xl">
+          <h2 className="text-headline-sm text-on-surface mb-xs">
+            {mode === "signin" ? "Welcome back" : "Create your workspace"}
           </h2>
-          <p className="text-body-md text-white/80 mb-xl">
-            Classify, draft, and route every incoming email — with a human in
-            control of what gets sent.
+          <p className="text-body-sm text-on-surface-variant mb-lg">
+            {mode === "signin" ? "Sign in to your triage queue." : "Spin up your organisation and inbox."}
           </p>
-          <ul className="flex flex-col gap-lg">
-            {FEATURES.map((f) => (
-              <li key={f.title} className="flex items-start gap-md">
-                <span className="shrink-0 w-10 h-10 rounded-lg bg-white/15 backdrop-blur flex items-center justify-center">
-                  <Icon name={f.icon} className="text-[22px]" />
-                </span>
-                <div>
-                  <p className="text-title-lg font-medium">{f.title}</p>
-                  <p className="text-body-sm text-white/75">{f.desc}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+
+          <form onSubmit={onSubmit} className="flex flex-col gap-md">
+            <label className="flex flex-col gap-xs">
+              <span className="text-label-md text-on-surface-variant">Email</span>
+              <div className="relative">
+                <Icon name="mail" className="absolute left-sm top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant" />
+                <input
+                  type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-10 pr-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="you@company.com"
+                />
+              </div>
+            </label>
+            <label className="flex flex-col gap-xs">
+              <span className="text-label-md text-on-surface-variant">Password</span>
+              <div className="relative">
+                <Icon name="lock" className="absolute left-sm top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant" />
+                <input
+                  type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-10 pr-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="••••••••"
+                />
+              </div>
+            </label>
+
+            {error && (
+              <p className="text-label-md text-on-error-container bg-error-container rounded-lg px-md py-sm">{error}</p>
+            )}
+            {info && (
+              <p className="text-label-md text-on-secondary-fixed bg-secondary-fixed rounded-lg px-md py-sm">{info}</p>
+            )}
+
+            <button
+              type="submit" disabled={loading} style={{ background: BTN_GRADIENT }}
+              className="mt-xs rounded-lg text-white py-sm text-label-md font-semibold hover:opacity-95 transition-opacity disabled:opacity-60 shadow-md"
+            >
+              {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Create workspace"}
+            </button>
+          </form>
+
+          <p className="text-body-sm text-on-surface-variant mt-lg text-center">
+            {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
+            <button
+              type="button"
+              onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); setInfo(null); }}
+              className="text-primary font-semibold hover:underline"
+            >
+              {mode === "signin" ? "Create an account" : "Sign in"}
+            </button>
+          </p>
         </div>
 
-        <p className="relative text-label-sm text-white/60">
-          Cut manual triage by ~70% · respond in seconds, not minutes.
+        <p className="text-center text-label-sm text-white/50 mt-lg">
+          Classify · draft · route — with a human in control.
         </p>
-      </aside>
-
-      {/* Form panel */}
-      <section className="flex items-center justify-center p-margin-mobile sm:p-xl">
-        <div className="w-full max-w-md">
-          {/* compact brand for mobile */}
-          <div className="flex lg:hidden items-center gap-sm mb-xl justify-center">
-            <Logo size={36} />
-            <h1 className="text-headline-sm font-bold text-primary">AITriage Ops</h1>
-          </div>
-
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl shadow-elevated">
-            <h2 className="text-headline-md mb-xs">
-              {mode === "signin" ? "Welcome back" : "Create your workspace"}
-            </h2>
-            <p className="text-body-sm text-on-surface-variant mb-lg">
-              {mode === "signin"
-                ? "Sign in to your triage queue."
-                : "Spin up your organisation and connected inbox."}
-            </p>
-
-            <form onSubmit={onSubmit} className="flex flex-col gap-md">
-              <label className="flex flex-col gap-xs">
-                <span className="text-label-md text-on-surface-variant">Email</span>
-                <div className="relative">
-                  <Icon name="mail" className="absolute left-sm top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant" />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-10 pr-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="you@company.com"
-                  />
-                </div>
-              </label>
-              <label className="flex flex-col gap-xs">
-                <span className="text-label-md text-on-surface-variant">Password</span>
-                <div className="relative">
-                  <Icon name="lock" className="absolute left-sm top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant" />
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-10 pr-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </label>
-
-              {error && (
-                <p className="text-label-md text-on-error-container bg-error-container rounded-lg px-md py-sm">{error}</p>
-              )}
-              {info && (
-                <p className="text-label-md text-on-secondary-fixed bg-secondary-fixed rounded-lg px-md py-sm">{info}</p>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                style={{ background: BTN_GRADIENT }}
-                className="mt-xs rounded-lg text-white py-sm text-label-md font-semibold hover:opacity-95 transition-opacity disabled:opacity-60 shadow-sm"
-              >
-                {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Create workspace"}
-              </button>
-            </form>
-
-            <p className="text-body-sm text-on-surface-variant mt-lg text-center">
-              {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
-              <button
-                type="button"
-                onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); setInfo(null); }}
-                className="text-primary font-semibold hover:underline"
-              >
-                {mode === "signin" ? "Create an account" : "Sign in"}
-              </button>
-            </p>
-          </div>
-        </div>
-      </section>
+      </div>
     </main>
   );
 }

@@ -86,22 +86,26 @@ export function Spinner({ label }: { label?: string }) {
 }
 
 /**
- * Brand logo — a gradient badge with a "routing" mark (one inbox node routed to
- * two recipients), reflecting triage + routing. Pure SVG, scales crisply.
+ * Brand logo — a refined gradient badge with a clean envelope mark (with a small
+ * AI "spark"), signalling an AI email app. Pure SVG, crisp at any size.
  */
-export function Logo({ size = 32, className = "" }: { size?: number; className?: string }) {
-  const inner = Math.round(size * 0.62);
+export function Logo({ size = 40, className = "" }: { size?: number; className?: string }) {
+  const inner = Math.round(size * 0.56);
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-xl shadow-sm ${className}`}
-      style={{ width: size, height: size, background: "linear-gradient(135deg,#6d63e6 0%,#3b309e 55%,#2f2ebe 100%)" }}
+      className={`inline-flex items-center justify-center ${className}`}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: Math.round(size * 0.28),
+        background: "linear-gradient(135deg,#818cf8 0%,#6366f1 45%,#7c3aed 100%)",
+        boxShadow: "0 8px 20px rgba(99,102,241,0.35)",
+      }}
       aria-hidden
     >
       <svg width={inner} height={inner} viewBox="0 0 24 24" fill="none">
-        <path d="M7 11.5 L16.5 6.5 M7 12.5 L16.5 17.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.95" />
-        <circle cx="5.5" cy="12" r="2.6" fill="white" />
-        <circle cx="18" cy="6" r="2.3" fill="white" />
-        <circle cx="18" cy="18" r="2.3" fill="white" />
+        <rect x="3" y="5.5" width="18" height="13.5" rx="3.2" stroke="white" strokeWidth="1.9" />
+        <path d="M4.6 8.2 L12 13 L19.4 8.2" stroke="white" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </span>
   );
