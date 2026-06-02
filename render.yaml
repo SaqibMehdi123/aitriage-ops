@@ -1,18 +1,36 @@
-# Render Blueprint (Infrastructure-as-Code) for the backend.
-# Creates the API, the Celery worker (+ Beat), a Redis instance, and a
-# Postgres database. The frontend deploys separately to Vercel (see DEPLOY.md).
+# Render Blueprint (free-tier friendly) for the backend.
 #
-# Set the secret env vars (SUPABASE_*, GROQ_API_KEY, TOKEN_ENCRYPTION_KEY,
-# SLACK_WEBHOOK_URL) in the Render dashboard after the first deploy.
+# Render's free tier has no standalone background-worker service, so the API,
+# the Celery worker, and the Beat scheduler all run inside ONE free web service.
+# Migrations run on boot. Free Postgres + Key Value (Redis) are provisioned too.
+#
+# Free-tier caveats:
+#   * The web service sleeps after ~15 min idle (cold start on next request;
+#     mailbox polling pauses while asleep).
+#   * Free Postgres is removed after ~30 days — fine for a demo.
+#
+# After the first deploy, set the secret env vars (sync:false) in the dashboard,
+# and point FRONTEND_ORIGIN at your Netlify URL.
 services:
   - type: web
     name: triage-api
-    runtime: docker
+    runtime: python
     rootDir: backend
-    dockerfilePath: ./Dockerfile
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # Migrate, start the worker+beat in the background, then run the API.
+    startCommand: >-
+      python ../scripts/migrate.py &&
+      (celery -A triage.worker.celery_app.celery worker -B --concurrency=1 --loglevel=INFO &)
+      && uvicorn triage.api.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
-    startCommand: uvicorn triage.api.main:app --host 0.0.0.0 --port 8000
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      - key: IN_DOCKER          # stops the migrate runner rewriting the DB host
+        value: "1"
+      - key: APP_ENV
+        value: production
       - key: DATABASE_URL
         fromDatabase:
           name: triage-db
@@ -22,8 +40,6 @@ services:
           name: triage-redis
           type: keyvalue
           property: connectionString
-      - key: APP_ENV
-        value: production
       - { key: SUPABASE_URL, sync: false }
       - { key: SUPABASE_ANON_KEY, sync: false }
       - { key: SUPABASE_JWT_SECRET, sync: false }
@@ -31,33 +47,14 @@ services:
       - { key: TOKEN_ENCRYPTION_KEY, sync: false }
       - { key: SLACK_WEBHOOK_URL, sync: false }
       - { key: FRONTEND_ORIGIN, sync: false }
-
-  - type: worker
-    name: triage-worker
-    runtime: docker
-    rootDir: backend
-    dockerfilePath: ./Dockerfile
-    startCommand: celery -A triage.worker.celery_app.celery worker -B -s /tmp/celerybeat-schedule --loglevel=INFO --concurrency=2
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: triage-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          name: triage-redis
-          type: keyvalue
-          property: connectionString
-      - { key: SUPABASE_URL, sync: false }
-      - { key: SUPABASE_JWT_SECRET, sync: false }
-      - { key: GROQ_API_KEY, sync: false }
-      - { key: TOKEN_ENCRYPTION_KEY, sync: false }
-      - { key: SLACK_WEBHOOK_URL, sync: false }
+      - { key: CRM_PROVIDER, sync: false }
+      - { key: CRM_WEBHOOK_URL, sync: false }
+      - { key: HUBSPOT_TOKEN, sync: false }
 
   - type: keyvalue
     name: triage-redis
     plan: free
-    ipAllowList: []
+    ipAllowList: []          # only reachable from Render services
 
 databases:
   - name: triage-db
