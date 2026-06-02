@@ -302,14 +302,15 @@ class SendIn(BaseModel):
 
 @router.post("/{email_id}/send")
 def send_email(email_id: str, body: SendIn, ctx: AuthContext = Depends(get_auth_context)) -> dict:
-    """Mark the reviewed draft as sent and the email as handled, with audit.
+    """Send the reviewed reply to the original sender, then record the action.
 
-    NOTE: actual outbound delivery via the mail provider is a follow-up; this
-    records the human's send action (the core human-in-the-loop step) and, if
-    requested, a CRM log entry."""
+    For IMAP mailboxes the reply is actually delivered over SMTP using the
+    stored app-password credentials. For the demo 'manual' mailbox (no creds)
+    or OAuth mailboxes, the send is recorded but not transmitted."""
     with connection() as conn:
         email = conn.execute(
-            "SELECT id FROM emails WHERE id=%s AND organization_id=%s AND deleted_at IS NULL",
+            "SELECT id, account_id, from_address, subject, message_id FROM emails "
+            "WHERE id=%s AND organization_id=%s AND deleted_at IS NULL",
             (email_id, ctx.organization_id),
         ).fetchone()
         if not email:
@@ -322,19 +323,42 @@ def send_email(email_id: str, body: SendIn, ctx: AuthContext = Depends(get_auth_
         if not draft:
             raise HTTPException(status_code=400, detail="No draft to send for this email.")
 
-        final_body = body.body if body.body is not None else draft["body"]
-        was_edited = body.body is not None and body.body.strip() != (draft["body"] or "").strip()
-        with conn.transaction():
-            conn.execute(
-                "UPDATE drafts SET body=%s, status='sent', was_edited=%s, sent_by=%s, sent_at=now() WHERE id=%s",
-                (final_body, was_edited, ctx.user_id, draft["id"]),
-            )
-            conn.execute("UPDATE emails SET status='sent' WHERE id=%s AND organization_id=%s",
-                         (email_id, ctx.organization_id))
-            conn.execute(
-                "INSERT INTO audit_logs (organization_id, actor_id, action, entity) VALUES (%s,%s,'sent',%s)",
-                (ctx.organization_id, ctx.user_id,
-                 _json.dumps({"type": "email", "id": email_id, "draft_id": str(draft["id"]),
-                              "log_to_crm": body.log_to_crm})),
-            )
-    return {"status": "sent", "email_id": email_id, "logged_to_crm": body.log_to_crm}
+    final_body = body.body if body.body is not None else draft["body"]
+    was_edited = body.body is not None and body.body.strip() != (draft["body"] or "").strip()
+
+    # Attempt real delivery for mailboxes that support it.
+    from ...ingestion import accounts as mail_accounts
+    from ...outbound import can_send_via_smtp, send_reply
+
+    delivered = False
+    account = mail_accounts.get_account(ctx.organization_id, str(email["account_id"])) if email.get("account_id") else None
+    if account:
+        creds = mail_accounts.load_secrets(account)
+        if can_send_via_smtp(account["provider"], creds):
+            try:
+                send_reply(
+                    creds,
+                    from_addr=account["email_address"],
+                    to_addr=email["from_address"],
+                    subject=email["subject"],
+                    body=final_body,
+                    in_reply_to=email["message_id"],
+                )
+                delivered = True
+            except Exception as exc:
+                raise HTTPException(status_code=502, detail=f"Failed to deliver email: {exc}")
+
+    with connection() as conn, conn.transaction():
+        conn.execute(
+            "UPDATE drafts SET body=%s, status='sent', was_edited=%s, sent_by=%s, sent_at=now() WHERE id=%s",
+            (final_body, was_edited, ctx.user_id, draft["id"]),
+        )
+        conn.execute("UPDATE emails SET status='sent' WHERE id=%s AND organization_id=%s",
+                     (email_id, ctx.organization_id))
+        conn.execute(
+            "INSERT INTO audit_logs (organization_id, actor_id, action, entity) VALUES (%s,%s,'sent',%s)",
+            (ctx.organization_id, ctx.user_id,
+             _json.dumps({"type": "email", "id": email_id, "draft_id": str(draft["id"]),
+                          "log_to_crm": body.log_to_crm, "delivered": delivered})),
+        )
+    return {"status": "sent", "email_id": email_id, "logged_to_crm": body.log_to_crm, "delivered": delivered}

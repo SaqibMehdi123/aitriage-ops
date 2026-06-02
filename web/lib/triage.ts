@@ -106,18 +106,23 @@ export async function streamDraft(
     for (const evt of events) {
       const lines = evt.split("\n");
       const eventType = lines.find((l) => l.startsWith("event:"))?.slice(6).trim();
-      const dataLine = lines.find((l) => l.startsWith("data:"))?.slice(5).trim() ?? "";
+      const rawData = lines.find((l) => l.startsWith("data:"));
+      if (rawData === undefined) continue;
+      // Strip "data:" then exactly ONE leading space (the SSE field delimiter).
+      // Do NOT trim — token spaces (e.g. " Thank", " you") are significant.
+      let data = rawData.slice(5);
+      if (data.startsWith(" ")) data = data.slice(1);
       if (eventType === "meta") {
         try {
-          onMeta?.(JSON.parse(dataLine));
+          onMeta?.(JSON.parse(data));
         } catch {
           /* ignore */
         }
       } else if (eventType === "error") {
-        throw new Error(dataLine);
+        throw new Error(data);
       } else if (!eventType) {
-        // default message event = a token; unescape newlines
-        onToken(dataLine.replace(/\\n/g, "\n"));
+        // default message event = a token; unescape the newlines we escaped server-side
+        onToken(data.replace(/\\n/g, "\n"));
       }
     }
   }

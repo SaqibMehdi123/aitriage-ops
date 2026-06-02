@@ -62,13 +62,13 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="mt-auto border-t border-outline-variant pt-sm px-sm flex flex-col gap-xs">
-        <a
-          href="#"
+        <Link
+          href="/support"
           className="flex items-center gap-md px-md py-sm rounded-r-full text-on-surface-variant hover:bg-surface-container transition-colors"
         >
           <span className="material-symbols-outlined">contact_support</span>
           <span className="text-label-md">Support</span>
-        </a>
+        </Link>
         <button
           onClick={signOut}
           className="flex items-center gap-md px-md py-sm rounded-r-full text-on-surface-variant hover:bg-surface-container transition-colors text-left"
