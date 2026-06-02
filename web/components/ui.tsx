@@ -78,10 +78,30 @@ export function Confidence({ value }: { value: number | null }) {
 
 export function Spinner({ label }: { label?: string }) {
   return (
-    <span className="inline-flex items-center gap-xs text-on-surface-variant text-body-sm">
-      <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+    <span className="inline-flex items-center gap-sm text-on-surface-variant text-body-sm">
+      <span className="ring-spinner w-4 h-4 animate-spin" aria-hidden />
       {label}
     </span>
+  );
+}
+
+/** Full-screen branded loader for route transitions. */
+export function PageLoader() {
+  return (
+    <div className="h-screen w-full flex flex-col items-center justify-center gap-lg bg-background">
+      <div className="relative flex items-center justify-center">
+        <span className="ring-spinner w-16 h-16 animate-spin" aria-hidden />
+        <span className="triage-mark absolute w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+          <span className="material-symbols-outlined text-[22px]">support_agent</span>
+        </span>
+      </div>
+      <div className="flex items-center gap-xs">
+        <span className="triage-dot w-2 h-2 rounded-full bg-primary" style={{ animationDelay: "0ms" }} />
+        <span className="triage-dot w-2 h-2 rounded-full bg-primary" style={{ animationDelay: "150ms" }} />
+        <span className="triage-dot w-2 h-2 rounded-full bg-primary" style={{ animationDelay: "300ms" }} />
+      </div>
+      <p className="text-label-sm text-on-surface-variant tracking-wide">Loading AITriage Ops…</p>
+    </div>
   );
 }
 

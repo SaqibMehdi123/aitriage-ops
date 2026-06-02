@@ -74,6 +74,7 @@ async def upload_file(
     file: UploadFile = File(...),
     title: str | None = Form(default=None),
     ctx: AuthContext = Depends(require_admin),
+    _rl: AuthContext = Depends(rate_limit("kb_upload", 30)),
 ) -> UploadResponse:
     data = await file.read()
     try:

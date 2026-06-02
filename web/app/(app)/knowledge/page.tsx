@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { deleteKnowledge, listKnowledge, uploadKnowledgeText } from "@/lib/triage";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { deleteKnowledge, listKnowledge, uploadKnowledgeFile, uploadKnowledgeText } from "@/lib/triage";
 import type { KnowledgeDoc } from "@/lib/types";
 import { Icon, Spinner } from "@/components/ui";
 
@@ -19,6 +19,26 @@ export default function KnowledgePage() {
   const [content, setContent] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [fileBusy, setFileBusy] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setFileBusy(true);
+    setError(null);
+    try {
+      for (const file of Array.from(files)) {
+        await uploadKnowledgeFile(file);
+      }
+      setTimeout(load, 1500);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "File upload failed");
+    } finally {
+      setFileBusy(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -73,6 +93,44 @@ export default function KnowledgePage() {
 
       <section className="rounded-xl border border-outline-variant bg-surface-container-lowest p-lg mb-lg">
         <h2 className="text-headline-sm mb-md">Add a document</h2>
+
+        {/* File upload dropzone */}
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); }}
+          className={`mb-md cursor-pointer rounded-lg border-2 border-dashed px-lg py-xl flex flex-col items-center justify-center text-center gap-xs transition-colors ${
+            dragOver ? "border-primary bg-surface-container-low" : "border-outline-variant hover:bg-surface-container-low"
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept=".pdf,.doc,.docx,.txt,.md,.markdown,.text"
+            className="hidden"
+            onChange={(e) => handleFiles(e.target.files)}
+          />
+          {fileBusy ? (
+            <Spinner label="Uploading & embedding…" />
+          ) : (
+            <>
+              <span className="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center mb-xs">
+                <Icon name="cloud_upload" className="text-[24px] text-on-surface-variant" />
+              </span>
+              <p className="text-body-sm text-on-surface font-medium">Click to upload or drag and drop</p>
+              <p className="text-label-sm text-on-surface-variant">PDF, DOCX, TXT or Markdown</p>
+            </>
+          )}
+        </div>
+
+        <div className="flex items-center gap-md my-md">
+          <div className="h-px bg-outline-variant flex-1" />
+          <span className="text-label-sm text-on-surface-variant">or paste text</span>
+          <div className="h-px bg-outline-variant flex-1" />
+        </div>
+
         <div className="flex flex-col gap-md">
           <input
             value={title}

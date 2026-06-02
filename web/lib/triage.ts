@@ -147,6 +147,26 @@ export function listKnowledge(): Promise<KnowledgeDoc[]> {
 export function uploadKnowledgeText(title: string, content: string): Promise<{ doc_id: string }> {
   return apiFetch(`/knowledge/text`, { method: "POST", body: JSON.stringify({ title, content }) });
 }
+export async function uploadKnowledgeFile(file: File): Promise<{ doc_id: string }> {
+  // Multipart upload — let the browser set the Content-Type boundary, so we
+  // can't reuse apiFetch (which forces application/json).
+  const supabase = createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch(`${API_BASE}/knowledge`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${session?.access_token ?? ""}` },
+    body: form,
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => res.statusText);
+    throw new Error(`Upload ${res.status}: ${detail}`);
+  }
+  return res.json();
+}
 export function deleteKnowledge(id: string): Promise<unknown> {
   return apiFetch(`/knowledge/${id}`, { method: "DELETE" });
 }
