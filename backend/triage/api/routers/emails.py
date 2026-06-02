@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from ...auth import AuthContext, get_auth_context
 from ...db import OrgScopedDb, connection
+from ..ratelimit import rate_limit
 from ... import jobs
 
 router = APIRouter(prefix="/emails", tags=["emails"])
@@ -159,7 +160,8 @@ class ClassifyResponse(BaseModel):
 
 
 @router.post("/{email_id}/classify", response_model=ClassifyResponse)
-def reclassify(email_id: str, ctx: AuthContext = Depends(get_auth_context)) -> ClassifyResponse:
+def reclassify(email_id: str, ctx: AuthContext = Depends(get_auth_context),
+               _rl: AuthContext = Depends(rate_limit("classify", 60))) -> ClassifyResponse:
     """Re-run classification for an email (e.g. after a prompt/model change)."""
     if not OrgScopedDb(ctx.organization_id).fetch_one("emails", {"id": email_id}):
         raise HTTPException(status_code=404, detail="Email not found")
@@ -206,7 +208,8 @@ class RegenResponse(BaseModel):
 
 
 @router.post("/{email_id}/draft/regenerate", response_model=RegenResponse)
-def regenerate_draft(email_id: str, ctx: AuthContext = Depends(get_auth_context)) -> RegenResponse:
+def regenerate_draft(email_id: str, ctx: AuthContext = Depends(get_auth_context),
+                     _rl: AuthContext = Depends(rate_limit("draft", 30))) -> RegenResponse:
     """Re-run RAG drafting for an email off the request cycle (maps to the spec's
     POST /emails/:id/draft:regenerate)."""
     if not OrgScopedDb(ctx.organization_id).fetch_one("emails", {"id": email_id}):
@@ -220,7 +223,8 @@ def regenerate_draft(email_id: str, ctx: AuthContext = Depends(get_auth_context)
 
 
 @router.get("/{email_id}/draft/stream")
-def stream_draft_endpoint(email_id: str, ctx: AuthContext = Depends(get_auth_context)) -> StreamingResponse:
+def stream_draft_endpoint(email_id: str, ctx: AuthContext = Depends(get_auth_context),
+                          _rl: AuthContext = Depends(rate_limit("draft", 30))) -> StreamingResponse:
     """Stream a freshly generated draft token-by-token as Server-Sent Events.
 
     The text arrives as `data:` events; a final `event: meta` carries the draft

@@ -9,7 +9,10 @@ from ..config import get_settings
 from ..db import connection
 from ..knowledge.retrieval import RetrievedChunk, retrieve
 from ..llm import get_llm
+from ..llm.wrapper import usage_context
 from ..logging import get_logger
+from ..orgsettings import get_org_settings
+from ..security.pii import redact_pii
 from .prompts import PROMPT_VERSION, build_messages
 
 log = get_logger(__name__)
@@ -65,6 +68,11 @@ def _gather_context(organization_id: str, email_id: str) -> tuple[dict, DraftCon
         for m in thread
     )
 
+    # Redact PII from the (untrusted) customer thread before it reaches the LLM,
+    # if the org enabled it. KB content is the company's own docs, left intact.
+    if get_org_settings(organization_id)["pii_redaction"]:
+        transcript = redact_pii(transcript)
+
     # Retrieve KB grounding from the email's own text.
     query = f"{email.get('subject') or ''}\n{(email.get('body_clean') or '')[:1000]}"
     chunks = retrieve(organization_id, query)
@@ -89,8 +97,9 @@ def draft_for_email(organization_id: str, email_id: str) -> DraftResult:
     _email, ctx = _gather_context(organization_id, email_id)
     messages = build_messages(ctx.thread_text, ctx.category, ctx.chunks)
 
-    resp = get_llm().complete(messages, tier="smart", temperature=0.3,
-                              max_tokens=700, trace_name="draft_email")
+    with usage_context(organization_id, "draft"):
+        resp = get_llm().complete(messages, tier="smart", temperature=0.3,
+                                  max_tokens=700, trace_name="draft_email")
     sources = _sources_payload(ctx.chunks)
     draft_id = _persist_draft(organization_id, email_id, resp.text.strip(), sources)
     _set_email_status(organization_id, email_id, "drafted")
@@ -110,9 +119,10 @@ def stream_draft(organization_id: str, email_id: str) -> Iterator[str]:
     messages = build_messages(ctx.thread_text, ctx.category, ctx.chunks)
 
     buffer: list[str] = []
-    for token in get_llm().stream(messages, tier="smart", temperature=0.3):
-        buffer.append(token)
-        yield token
+    with usage_context(organization_id, "draft"):
+        for token in get_llm().stream(messages, tier="smart", temperature=0.3):
+            buffer.append(token)
+            yield token
 
     body = "".join(buffer).strip()
     sources = _sources_payload(ctx.chunks)

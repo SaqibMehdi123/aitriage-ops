@@ -97,6 +97,8 @@ export default function AnalyticsPage() {
         <StatCard label="Median response" value={fmtDuration(s?.median_response_seconds ?? null)} icon="schedule" />
         <StatCard label="Hours saved" value={`${s?.hours_saved ?? 0}h`} icon="schedule_send" />
         <StatCard label="Draft acceptance" value={s?.draft_acceptance_rate != null ? `${Math.round(s.draft_acceptance_rate * 100)}%` : "—"} icon="thumb_up" />
+        <StatCard label="AI tokens used" value={(s?.llm_tokens ?? 0).toLocaleString()} icon="toll" />
+        <StatCard label="Failed jobs" value={String(s?.failed_jobs ?? 0)} icon="error" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">

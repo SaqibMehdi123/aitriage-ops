@@ -7,7 +7,10 @@ from dataclasses import dataclass
 from ..config import get_settings
 from ..db import connection
 from ..llm import LLMError, get_llm
+from ..llm.wrapper import usage_context
 from ..logging import get_logger
+from ..orgsettings import get_org_settings
+from ..security.pii import redact_pii
 from .prompts import PROMPT_VERSION, build_messages
 from .schemas import ClassificationResult
 
@@ -53,8 +56,13 @@ def classify_email(organization_id: str, email_id: str) -> ClassifyOutcome:
     if not email:
         raise ValueError(f"Email {email_id} not found for org {organization_id}")
 
+    subject, body = email["subject"], email["body_clean"]
+    if get_org_settings(organization_id)["pii_redaction"]:
+        subject, body = redact_pii(subject), redact_pii(body)
+
     try:
-        result = classify_text(email["subject"], email["body_clean"], email["from_address"])
+        with usage_context(organization_id, "classify"):
+            result = classify_text(subject, body, email["from_address"])
     except LLMError as exc:
         # Never guess: record a zero-confidence Other and send to human review.
         log.warning("classification_failed_routing_to_review", email_id=email_id, error=str(exc))

@@ -20,6 +20,8 @@ class Summary(BaseModel):
     median_response_seconds: float | None
     hours_saved: float
     draft_acceptance_rate: float | None
+    llm_tokens: int = 0
+    failed_jobs: int = 0
 
 
 class VolumePoint(BaseModel):
@@ -100,6 +102,17 @@ def analytics(ctx: AuthContext = Depends(get_auth_context), days: int = Query(de
             (org,),
         ).fetchall()
 
+        tokens = conn.execute(
+            f"SELECT COALESCE(SUM(prompt_tokens + completion_tokens), 0) AS t FROM llm_usage "
+            f"WHERE organization_id=%s AND created_at >= {window}",
+            (org,),
+        ).fetchone()["t"]
+
+        failed = conn.execute(
+            f"SELECT count(*) AS n FROM jobs WHERE organization_id=%s AND status='failed' AND created_at >= {window}",
+            (org,),
+        ).fetchone()["n"]
+
     minutes = get_settings().minutes_saved_per_email
     cat_total = sum(r["n"] for r in cat_rows) or 1
     acceptance = (accept["unedited"] / accept["total"]) if accept and accept["total"] else None
@@ -111,6 +124,8 @@ def analytics(ctx: AuthContext = Depends(get_auth_context), days: int = Query(de
             median_response_seconds=float(median) if median is not None else None,
             hours_saved=round(handled * minutes / 60.0, 1),
             draft_acceptance_rate=round(acceptance, 3) if acceptance is not None else None,
+            llm_tokens=int(tokens),
+            failed_jobs=int(failed),
         ),
         volume=[VolumePoint(date=r["day"], ai_handled=r["ai_handled"], human_required=r["human_required"]) for r in volume_rows],
         category_mix=[CategorySlice(category=r["category"], count=r["n"], pct=round(r["n"] / cat_total, 3)) for r in cat_rows],

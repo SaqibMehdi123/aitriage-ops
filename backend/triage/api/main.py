@@ -19,6 +19,7 @@ from ..config import get_settings
 from ..db import close_pool, get_pool
 from ..logging import configure_logging, get_logger
 from .routers import accounts, analytics, emails, health, knowledge, me, rules, webhooks
+from .routers import settings as settings_router
 
 log = get_logger(__name__)
 
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
     app.include_router(knowledge.router)
     app.include_router(rules.router)
     app.include_router(analytics.router)
+    app.include_router(settings_router.router)
     return app
 
 

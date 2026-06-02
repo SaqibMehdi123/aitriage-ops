@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from ...auth import AuthContext, get_auth_context, require_admin
 from ...db import OrgScopedDb
+from ..ratelimit import rate_limit
 from ...knowledge.extract import UnsupportedDocument, extract_text
 from ...knowledge.retrieval import retrieve
 from ...knowledge.service import create_document
@@ -59,7 +60,8 @@ class TextUploadIn(BaseModel):
 
 
 @router.post("/text", response_model=UploadResponse)
-def upload_text(body: TextUploadIn, ctx: AuthContext = Depends(require_admin)) -> UploadResponse:
+def upload_text(body: TextUploadIn, ctx: AuthContext = Depends(require_admin),
+                _rl: AuthContext = Depends(rate_limit("kb_upload", 30))) -> UploadResponse:
     if not body.content.strip():
         raise HTTPException(status_code=400, detail="Content is empty.")
     doc_id = create_document(ctx.organization_id, body.title, body.content, source=body.source)

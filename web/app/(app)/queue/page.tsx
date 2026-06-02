@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { listEmails, ingestEmail } from "@/lib/triage";
 import type { QueueItem } from "@/lib/types";
 import { Avatar, CategoryChip, Confidence, Icon, Spinner, StatusChip, UrgencyBadge } from "@/components/ui";
@@ -9,29 +9,48 @@ import { Avatar, CategoryChip, Confidence, Icon, Spinner, StatusChip, UrgencyBad
 const CATEGORIES = ["Support", "Sales", "Billing", "Spam", "Other"];
 const URGENCIES = ["high", "normal", "low"];
 const STATUSES = ["new", "classified", "drafted", "review", "sent"];
+const PAGE_SIZE = 25;
 
-export default function QueuePage() {
+function QueueInner() {
   const router = useRouter();
+  const params = useSearchParams();
+
+  // Filters + paging live in the URL, so opening an email and pressing Back
+  // returns to the exact same page and filters.
+  const category = params.get("category") ?? "";
+  const urgency = params.get("urgency") ?? "";
+  const status = params.get("status") ?? "";
+  const offset = Math.max(0, parseInt(params.get("offset") ?? "0", 10) || 0);
+
   const [items, setItems] = useState<QueueItem[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [category, setCategory] = useState("");
-  const [urgency, setUrgency] = useState("");
-  const [status, setStatus] = useState("");
   const [demoBusy, setDemoBusy] = useState(false);
+
+  function setParams(next: Record<string, string>, resetOffset = true) {
+    const sp = new URLSearchParams(params.toString());
+    for (const [k, v] of Object.entries(next)) {
+      if (v) sp.set(k, v);
+      else sp.delete(k);
+    }
+    if (resetOffset && !("offset" in next)) sp.delete("offset");
+    router.replace(`/queue?${sp.toString()}`, { scroll: false });
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await listEmails({ category, urgency, status, limit: 100 });
+      const res = await listEmails({ category, urgency, status, limit: PAGE_SIZE, offset });
       setItems(res.items);
+      setTotal(res.total);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     } finally {
       setLoading(false);
     }
-  }, [category, urgency, status]);
+  }, [category, urgency, status, offset]);
 
   useEffect(() => {
     load();
@@ -48,7 +67,6 @@ export default function QueuePage() {
       for (const s of samples) {
         await ingestEmail({ message_id: `demo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, ...s });
       }
-      // Give the worker a moment to classify/route/draft, then refresh.
       setTimeout(load, 2500);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Seed failed");
@@ -72,6 +90,11 @@ export default function QueuePage() {
     </select>
   );
 
+  const from = total === 0 ? 0 : offset + 1;
+  const to = Math.min(offset + PAGE_SIZE, total);
+  const canPrev = offset > 0;
+  const canNext = offset + PAGE_SIZE < total;
+
   return (
     <div className="p-margin-desktop max-w-container-max">
       <header className="mb-lg flex items-start justify-between">
@@ -80,27 +103,22 @@ export default function QueuePage() {
           <p className="text-body-md text-on-surface-variant">Reviewing incoming support requests.</p>
         </div>
         <div className="flex items-center gap-sm">
-          <button
-            onClick={seedDemo}
-            disabled={demoBusy}
-            className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs disabled:opacity-60"
-          >
+          <button onClick={seedDemo} disabled={demoBusy}
+            className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs disabled:opacity-60">
             <Icon name="science" className="text-[18px]" />
             {demoBusy ? "Seeding…" : "Seed demo emails"}
           </button>
-          <button
-            onClick={load}
-            className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs"
-          >
+          <button onClick={load}
+            className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs">
             <Icon name="refresh" className="text-[18px]" /> Refresh
           </button>
         </div>
       </header>
 
       <div className="flex flex-wrap gap-sm mb-md">
-        <Select value={category} onChange={setCategory} placeholder="Category" options={CATEGORIES} />
-        <Select value={urgency} onChange={setUrgency} placeholder="Urgency" options={URGENCIES} />
-        <Select value={status} onChange={setStatus} placeholder="Status" options={STATUSES} />
+        <Select value={category} onChange={(v) => setParams({ category: v })} placeholder="Category" options={CATEGORIES} />
+        <Select value={urgency} onChange={(v) => setParams({ urgency: v })} placeholder="Urgency" options={URGENCIES} />
+        <Select value={status} onChange={(v) => setParams({ status: v })} placeholder="Status" options={STATUSES} />
       </div>
 
       {error && (
@@ -124,11 +142,8 @@ export default function QueuePage() {
           </thead>
           <tbody>
             {items.map((it) => (
-              <tr
-                key={it.id}
-                onClick={() => router.push(`/emails/${it.id}`)}
-                className="border-b border-surface-container-high last:border-0 hover:bg-surface-container-low cursor-pointer transition-colors"
-              >
+              <tr key={it.id} onClick={() => router.push(`/emails/${it.id}`)}
+                className="border-b border-surface-container-high last:border-0 hover:bg-surface-container-low cursor-pointer transition-colors">
                 <td className="px-lg py-md">
                   <div className="flex items-center gap-sm">
                     <Avatar name={it.from_address} className="w-8 h-8" />
@@ -176,6 +191,37 @@ export default function QueuePage() {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {total > 0 && (
+        <div className="flex items-center justify-between mt-md text-body-sm text-on-surface-variant">
+          <span>Showing <strong className="text-on-surface">{from}–{to}</strong> of {total}</span>
+          <div className="flex items-center gap-sm">
+            <button
+              disabled={!canPrev}
+              onClick={() => setParams({ offset: String(Math.max(0, offset - PAGE_SIZE)) }, false)}
+              className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-xs"
+            >
+              <Icon name="chevron_left" className="text-[18px]" /> Prev
+            </button>
+            <button
+              disabled={!canNext}
+              onClick={() => setParams({ offset: String(offset + PAGE_SIZE) }, false)}
+              className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-xs"
+            >
+              Next <Icon name="chevron_right" className="text-[18px]" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+export default function QueuePage() {
+  return (
+    <Suspense fallback={<div className="p-margin-desktop"><Spinner label="Loading…" /></div>}>
+      <QueueInner />
+    </Suspense>
   );
 }

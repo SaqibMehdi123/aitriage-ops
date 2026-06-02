@@ -10,6 +10,7 @@ import type {
   KnowledgeDoc,
   MailAccount,
   Member,
+  OrgSettings,
   QueueResponse,
   Rule,
 } from "@/lib/types";
@@ -175,4 +176,12 @@ export function syncAccount(id: string): Promise<unknown> {
 }
 export function disconnectAccount(id: string): Promise<unknown> {
   return apiFetch(`/accounts/${id}`, { method: "DELETE" });
+}
+
+// ── Org settings (privacy) ────────────────────────────────────────────────
+export function getOrgSettings(): Promise<OrgSettings> {
+  return apiFetch<OrgSettings>(`/settings`);
+}
+export function updateOrgSettings(s: OrgSettings): Promise<OrgSettings> {
+  return apiFetch(`/settings`, { method: "PUT", body: JSON.stringify(s) });
 }

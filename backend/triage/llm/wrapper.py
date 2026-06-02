@@ -11,6 +11,8 @@ Responsibilities (TRD §LLM correctness, Cost control, Observability):
 """
 from __future__ import annotations
 
+import contextlib
+import contextvars
 import json
 from functools import lru_cache
 from typing import Literal, Type, TypeVar
@@ -32,6 +34,36 @@ log = get_logger(__name__)
 
 ModelTier = Literal["fast", "smart"]
 T = TypeVar("T", bound=BaseModel)
+
+# Per-call usage attribution. Services bind (org, kind) so the wrapper can meter
+# token usage to a tenant without threading it through every signature.
+_usage_ctx: contextvars.ContextVar[dict | None] = contextvars.ContextVar("llm_usage_ctx", default=None)
+
+
+@contextlib.contextmanager
+def usage_context(organization_id: str | None, kind: str):
+    token = _usage_ctx.set({"organization_id": organization_id, "kind": kind})
+    try:
+        yield
+    finally:
+        _usage_ctx.reset(token)
+
+
+def _record_usage(model: str, resp: "LLMResponse") -> None:
+    ctx = _usage_ctx.get()
+    if not ctx or not ctx.get("organization_id"):
+        return
+    try:
+        from ..db import connection
+
+        with connection() as conn:
+            conn.execute(
+                "INSERT INTO llm_usage (organization_id, kind, model, prompt_tokens, completion_tokens) "
+                "VALUES (%s, %s, %s, %s, %s)",
+                (ctx["organization_id"], ctx.get("kind"), model, resp.prompt_tokens, resp.completion_tokens),
+            )
+    except Exception as exc:  # never let metering break a model call
+        log.warning("llm_usage_record_failed", error=str(exc))
 
 
 class LLM:
@@ -147,6 +179,7 @@ class LLM:
             completion_tokens=resp.completion_tokens,
             latency_ms=resp.latency_ms,
         )
+        _record_usage(model, resp)
         if self._langfuse is None:
             return
         try:

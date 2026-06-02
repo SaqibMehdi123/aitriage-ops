@@ -100,6 +100,11 @@ export interface KnowledgeDoc {
   created_at: string | null;
 }
 
+export interface OrgSettings {
+  pii_redaction: boolean;
+  retention_days: number | null;
+}
+
 export interface MailAccount {
   id: string;
   provider: string;
@@ -115,6 +120,8 @@ export interface Analytics {
     median_response_seconds: number | null;
     hours_saved: number;
     draft_acceptance_rate: number | null;
+    llm_tokens: number;
+    failed_jobs: number;
   };
   volume: { date: string; ai_handled: number; human_required: number }[];
   category_mix: { category: string; count: number; pct: number }[];

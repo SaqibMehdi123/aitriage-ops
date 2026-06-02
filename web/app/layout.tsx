@@ -11,9 +11,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // suppressHydrationWarning: some browser extensions (e.g. Heurio, Grammarly)
+  // inject attributes/elements into <html>/<body> before React hydrates, which
+  // would otherwise trigger a hydration mismatch. This only suppresses warnings
+  // for these top-level nodes, not real app markup.
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-background text-on-surface antialiased">
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className="min-h-screen bg-background text-on-surface antialiased"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

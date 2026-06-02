@@ -45,4 +45,9 @@ celery.conf.beat_schedule = {
         "task": "triage.poll_mailboxes",
         "schedule": 60.0,
     },
+    # Enforce per-org data retention once an hour.
+    "purge-expired-hourly": {
+        "task": "triage.purge_expired",
+        "schedule": 3600.0,
+    },
 }

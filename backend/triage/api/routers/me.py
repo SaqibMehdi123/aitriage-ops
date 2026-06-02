@@ -82,6 +82,28 @@ class JobStatusResponse(BaseModel):
     error: str | None = None
 
 
+@router.get("/jobs", response_model=list[JobStatusResponse])
+def list_jobs(ctx: AuthContext = Depends(get_auth_context), status: str | None = None, limit: int = 50) -> list[JobStatusResponse]:
+    """List recent jobs (optionally filter by status, e.g. 'failed' for the
+    dead-letter view)."""
+    from ...db import connection
+
+    sql = "SELECT id, kind, status, progress, result, error FROM jobs WHERE organization_id = %s"
+    params: list = [ctx.organization_id]
+    if status:
+        sql += " AND status = %s"
+        params.append(status)
+    sql += " ORDER BY created_at DESC LIMIT %s"
+    params.append(min(limit, 200))
+    with connection() as conn:
+        rows = conn.execute(sql, params).fetchall()
+    return [
+        JobStatusResponse(id=str(r["id"]), kind=r["kind"], status=r["status"],
+                          progress=float(r["progress"]), result=r.get("result"), error=r.get("error"))
+        for r in rows
+    ]
+
+
 @router.get("/jobs/{job_id}", response_model=JobStatusResponse)
 def get_job(job_id: str, ctx: AuthContext = Depends(get_auth_context)) -> JobStatusResponse:
     db = OrgScopedDb(ctx.organization_id)

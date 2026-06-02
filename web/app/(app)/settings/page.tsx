@@ -1,9 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { connectImap, disconnectAccount, listAccounts, syncAccount } from "@/lib/triage";
-import type { MailAccount } from "@/lib/types";
+import { connectImap, disconnectAccount, getOrgSettings, listAccounts, syncAccount, updateOrgSettings } from "@/lib/triage";
+import type { MailAccount, OrgSettings } from "@/lib/types";
 import { Icon, Spinner } from "@/components/ui";
+
+const RETENTION_OPTIONS: { label: string; value: number | null }[] = [
+  { label: "Keep indefinitely", value: null },
+  { label: "30 days", value: 30 },
+  { label: "90 days", value: 90 },
+  { label: "1 year", value: 365 },
+];
 
 const STATUS_STYLES: Record<string, string> = {
   connected: "bg-tertiary-fixed text-on-tertiary-fixed",
@@ -22,16 +29,30 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
+  const [orgSettings, setOrgSettings] = useState<OrgSettings>({ pii_redaction: false, retention_days: null });
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setAccounts(await listAccounts());
+      const [accs, os] = await Promise.all([listAccounts(), getOrgSettings().catch(() => null)]);
+      setAccounts(accs);
+      if (os) setOrgSettings(os);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     } finally {
       setLoading(false);
     }
   }, []);
+
+  async function saveOrgSettings(next: OrgSettings) {
+    setOrgSettings(next);
+    try {
+      await updateOrgSettings(next);
+      setNotice("Privacy settings saved.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to save settings");
+    }
+  }
 
   useEffect(() => {
     load();
@@ -132,11 +153,39 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-outline-variant bg-surface-container-low p-lg">
-        <h2 className="text-headline-sm mb-xs">Privacy &amp; Security</h2>
-        <p className="text-body-sm text-on-surface-variant">
-          PII redaction and per-tenant data-retention controls arrive in Module 9 (Hardening).
-        </p>
+      <section className="rounded-xl border border-outline-variant bg-surface-container-lowest p-lg">
+        <h2 className="text-headline-sm mb-md">Privacy &amp; Security</h2>
+
+        <div className="flex items-center justify-between py-sm border-b border-surface-container-high">
+          <div>
+            <p className="text-body-sm text-on-surface font-medium">PII redaction</p>
+            <p className="text-label-sm text-on-surface-variant">Mask emails, phone numbers, and cards before any AI call.</p>
+          </div>
+          <button
+            role="switch"
+            aria-checked={orgSettings.pii_redaction}
+            onClick={() => saveOrgSettings({ ...orgSettings, pii_redaction: !orgSettings.pii_redaction })}
+            className={`relative w-11 h-6 rounded-full transition-colors ${orgSettings.pii_redaction ? "bg-primary" : "bg-surface-container-highest"}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-surface-container-lowest transition-transform ${orgSettings.pii_redaction ? "translate-x-5" : ""}`} />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between py-sm">
+          <div>
+            <p className="text-body-sm text-on-surface font-medium">Data retention</p>
+            <p className="text-label-sm text-on-surface-variant">Automatically remove emails older than this window.</p>
+          </div>
+          <select
+            value={String(orgSettings.retention_days ?? "")}
+            onChange={(e) => saveOrgSettings({ ...orgSettings, retention_days: e.target.value === "" ? null : Number(e.target.value) })}
+            className="rounded border border-outline-variant bg-surface-container-lowest px-md py-sm text-label-md focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            {RETENTION_OPTIONS.map((o) => (
+              <option key={String(o.value)} value={o.value ?? ""}>{o.label}</option>
+            ))}
+          </select>
+        </div>
       </section>
     </div>
   );

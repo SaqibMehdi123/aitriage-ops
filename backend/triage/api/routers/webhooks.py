@@ -17,6 +17,7 @@ from ...config import get_settings
 from ...ingestion import accounts
 from ...ingestion.schemas import InboundEmail
 from ...ingestion.service import ingest_email
+from ..ratelimit import rate_limit
 
 router = APIRouter(tags=["ingestion"])
 
@@ -67,7 +68,8 @@ class ManualIngestIn(BaseModel):
 
 
 @router.post("/emails/ingest", response_model=IngestResultOut)
-def manual_ingest(body: ManualIngestIn, ctx: AuthContext = Depends(get_auth_context)) -> IngestResultOut:
+def manual_ingest(body: ManualIngestIn, ctx: AuthContext = Depends(get_auth_context),
+                  _rl: AuthContext = Depends(rate_limit("ingest", 60))) -> IngestResultOut:
     account_id = body.account_id
     if account_id:
         if not accounts.get_account(ctx.organization_id, account_id):

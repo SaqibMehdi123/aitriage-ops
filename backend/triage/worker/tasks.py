@@ -47,12 +47,42 @@ def ping(self, *, job_id: str | None = None, message: str = "pong") -> dict:
     return {"message": message, "worker": self.request.hostname}
 
 
+@celery.task(name="triage.purge_expired")
+def purge_expired() -> dict:
+    """Enforce per-org data retention: soft-delete emails (and their drafts/
+    classifications) older than each org's retention window (Module 9 privacy)."""
+    from ..db import connection
+
+    purged = 0
+    with connection() as conn:
+        orgs = conn.execute(
+            "SELECT organization_id, retention_days FROM org_settings WHERE retention_days IS NOT NULL"
+        ).fetchall()
+        for o in orgs:
+            org = str(o["organization_id"])
+            days = int(o["retention_days"])
+            rows = conn.execute(
+                f"UPDATE emails SET deleted_at = now() WHERE organization_id = %s "
+                f"AND deleted_at IS NULL AND created_at < now() - interval '{days} days' RETURNING id",
+                (org,),
+            ).fetchall()
+            ids = [r["id"] for r in rows]
+            if ids:
+                conn.execute("UPDATE drafts SET deleted_at = now() WHERE email_id = ANY(%s) AND deleted_at IS NULL", (ids,))
+                conn.execute("UPDATE classifications SET deleted_at = now() WHERE email_id = ANY(%s) AND deleted_at IS NULL", (ids,))
+            purged += len(ids)
+    if purged:
+        log.info("purge_expired", purged=purged)
+    return {"purged": purged}
+
+
 @celery.task(name="triage.poll_mailboxes")
 def poll_mailboxes() -> dict:
     """Periodic poller (Celery Beat): enqueue a sync for every connected mailbox.
 
-    This is what makes real-email ingestion automatic — it runs on a schedule and
-    fans out one sync_account task per connected, non-IMAP-manual account."""
+    This is what makes real-email ingestion automatic — it fans out one
+    sync_account task per connected mailbox (skipping the demo 'manual' inbox).
+    No job row per poll, to avoid bloating the jobs table."""
     from ..db import connection
 
     enqueued = 0
@@ -67,31 +97,6 @@ def poll_mailboxes() -> dict:
         enqueued += 1
     if enqueued:
         log.info("poll_mailboxes_enqueued", count=enqueued)
-    return {"enqueued": enqueued}
-
-
-@celery.task(name="triage.poll_mailboxes")
-def poll_mailboxes() -> dict:
-    """Periodic poller (Celery Beat): enqueue a sync for every connected mailbox.
-
-    Runs across all organisations; each mailbox is synced idempotently so new
-    messages are ingested without duplicates."""
-    from ..db import connection
-
-    with connection() as conn:
-        accounts = conn.execute(
-            "SELECT id, organization_id FROM email_accounts "
-            "WHERE status = 'connected' AND deleted_at IS NULL"
-        ).fetchall()
-
-    enqueued = 0
-    for a in accounts:
-        org = str(a["organization_id"])
-        aid = str(a["id"])
-        job_id = jobs.create_job("ingest", organization_id=org, payload={"account_id": aid, "poll": True})
-        sync_account.apply_async(kwargs={"organization_id": org, "account_id": aid, "job_id": job_id})
-        enqueued += 1
-    log.info("poll_mailboxes", accounts=enqueued)
     return {"enqueued": enqueued}
 
 
