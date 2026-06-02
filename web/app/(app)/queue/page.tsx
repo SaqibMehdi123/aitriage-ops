@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { listEmails, ingestEmail } from "@/lib/triage";
+import { listEmails } from "@/lib/triage";
 import type { QueueItem } from "@/lib/types";
 import { Avatar, CategoryChip, Confidence, Icon, Spinner, StatusChip, UrgencyBadge } from "@/components/ui";
 
@@ -26,7 +26,6 @@ function QueueInner() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [demoBusy, setDemoBusy] = useState(false);
 
   function setParams(next: Record<string, string>, resetOffset = true) {
     const sp = new URLSearchParams(params.toString());
@@ -56,25 +55,6 @@ function QueueInner() {
     load();
   }, [load]);
 
-  async function seedDemo() {
-    setDemoBusy(true);
-    try {
-      const samples = [
-        { subject: "Login issues on enterprise tier", from_address: "it@acmecorp.com", body: "We can't log in to the enterprise dashboard since this morning — it's urgent, our team is blocked." },
-        { subject: "Interested in Enterprise pricing", from_address: "vp@globex.com", body: "We're a team of 120 evaluating tools for Q3. Could you share Enterprise pricing and SSO details?" },
-        { subject: "Invoice #4092 missing details", from_address: "ap@retailco.com", body: "Our latest invoice seems to be missing line items. Can you resend a corrected copy?" },
-      ];
-      for (const s of samples) {
-        await ingestEmail({ message_id: `demo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, ...s });
-      }
-      setTimeout(load, 2500);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Seed failed");
-    } finally {
-      setDemoBusy(false);
-    }
-  }
-
   const Select = ({ value, onChange, placeholder, options }: {
     value: string; onChange: (v: string) => void; placeholder: string; options: string[];
   }) => (
@@ -103,11 +83,6 @@ function QueueInner() {
           <p className="text-body-md text-on-surface-variant">Reviewing incoming support requests.</p>
         </div>
         <div className="flex items-center gap-sm">
-          <button onClick={seedDemo} disabled={demoBusy}
-            className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs disabled:opacity-60">
-            <Icon name="science" className="text-[18px]" />
-            {demoBusy ? "Seeding…" : "Seed demo emails"}
-          </button>
           <button onClick={load}
             className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs">
             <Icon name="refresh" className="text-[18px]" /> Refresh
@@ -186,7 +161,8 @@ function QueueInner() {
             <Icon name="done_all" className="text-[32px] text-on-surface-variant" />
             <p className="text-headline-sm">All caught up</p>
             <p className="text-body-sm text-on-surface-variant">
-              No items match your current filters. Use <em>Seed demo emails</em> to try the pipeline.
+              No items match your current filters. Connect a mailbox in <em>Settings</em>, and new
+              email will be triaged here automatically.
             </p>
           </div>
         )}

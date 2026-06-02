@@ -85,14 +85,36 @@ export function Spinner({ label }: { label?: string }) {
   );
 }
 
+/**
+ * Brand logo — a gradient badge with a "routing" mark (one inbox node routed to
+ * two recipients), reflecting triage + routing. Pure SVG, scales crisply.
+ */
+export function Logo({ size = 32, className = "" }: { size?: number; className?: string }) {
+  const inner = Math.round(size * 0.62);
+  return (
+    <span
+      className={`inline-flex items-center justify-center rounded-xl shadow-sm ${className}`}
+      style={{ width: size, height: size, background: "linear-gradient(135deg,#6d63e6 0%,#3b309e 55%,#2f2ebe 100%)" }}
+      aria-hidden
+    >
+      <svg width={inner} height={inner} viewBox="0 0 24 24" fill="none">
+        <path d="M7 11.5 L16.5 6.5 M7 12.5 L16.5 17.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.95" />
+        <circle cx="5.5" cy="12" r="2.6" fill="white" />
+        <circle cx="18" cy="6" r="2.3" fill="white" />
+        <circle cx="18" cy="18" r="2.3" fill="white" />
+      </svg>
+    </span>
+  );
+}
+
 /** Full-screen branded loader for route transitions. */
 export function PageLoader() {
   return (
     <div className="h-screen w-full flex flex-col items-center justify-center gap-lg bg-background">
       <div className="relative flex items-center justify-center">
         <span className="ring-spinner w-16 h-16 animate-spin" aria-hidden />
-        <span className="triage-mark absolute w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-on-primary">
-          <span className="material-symbols-outlined text-[22px]">support_agent</span>
+        <span className="triage-mark absolute">
+          <Logo size={36} />
         </span>
       </div>
       <div className="flex items-center gap-xs">

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Logo } from "@/components/ui";
 
 type NavItem = { href: string; label: string; icon: string };
 
@@ -29,9 +30,7 @@ export default function Sidebar() {
     <nav className="fixed left-0 top-0 h-screen w-64 border-r border-outline-variant bg-surface flex flex-col py-md shrink-0 z-10">
       {/* Brand */}
       <div className="px-md mb-xl flex items-center gap-sm">
-        <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
-          <span className="material-symbols-outlined text-[20px]">support_agent</span>
-        </div>
+        <Logo size={36} />
         <div>
           <h1 className="text-headline-sm font-bold text-primary leading-tight">AITriage Ops</h1>
           <p className="text-label-sm text-on-surface-variant font-normal">High-Velocity Support</p>
