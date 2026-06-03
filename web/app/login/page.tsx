@@ -97,7 +97,7 @@ export default function LoginPage() {
             <p className="text-body-sm text-on-surface-variant">Sign in to your operational dashboard.</p>
           </div>
 
-          <AuthSocial providers={["google", "azure"]} />
+          <AuthSocial providers={["google"]} />
 
           <div className="flex items-center my-lg">
             <div className="flex-grow h-px bg-outline-variant/60" />

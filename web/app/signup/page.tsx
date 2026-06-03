@@ -103,7 +103,7 @@ export default function SignupPage() {
             <p className="text-body-sm text-on-surface-variant mt-xs">Deploy precision operations in minutes.</p>
           </div>
 
-          <AuthSocial providers={["google", "github"]} />
+          <AuthSocial providers={["google"]} />
 
           <div className="flex items-center my-lg">
             <div className="h-px bg-outline-variant/60 flex-1" />
