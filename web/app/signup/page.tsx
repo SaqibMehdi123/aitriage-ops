@@ -53,21 +53,21 @@ export default function SignupPage() {
       <div className="fixed top-0 left-0 w-full h-1 bg-primary z-50" />
 
       {/* Left value props */}
-      <section className="hidden md:flex w-1/2 flex-col justify-between p-xl lg:p-[64px] bg-surface-container-low dot-grid border-r border-outline-variant/30 relative overflow-hidden">
+      <section className="hidden md:flex w-1/2 flex-col justify-center items-center p-xl lg:p-[64px] bg-surface-container-low dot-grid border-r border-outline-variant/30 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed/40 to-transparent pointer-events-none" />
-        <div className="relative z-10">
+        <div className="relative z-10 max-w-lg">
           <div className="flex items-center gap-sm mb-xl">
             <Logo size={36} />
             <span className="text-headline-sm font-bold text-on-surface">AITriage Ops</span>
           </div>
-          <h1 className="text-display-lg lg:text-[40px] lg:leading-[48px] font-semibold tracking-tight mb-lg max-w-md">
+          <h1 className="text-display-lg lg:text-[40px] lg:leading-[48px] font-semibold tracking-tight mb-lg">
             Engineered for High-Performance Operations.
           </h1>
-          <p className="text-body-md text-on-surface-variant mb-xl max-w-md">
+          <p className="text-body-md text-on-surface-variant mb-xl">
             Join the platform that transforms a chaotic inbox into precise, actionable
             workflows — with a human in control of every reply.
           </p>
-          <div className="flex flex-col gap-lg max-w-md">
+          <div className="flex flex-col gap-lg">
             {VALUE_PROPS.map((v) => (
               <div key={v.title} className="flex gap-md">
                 <div className="shrink-0 w-10 h-10 rounded-lg bg-surface-container-high border border-outline-variant/50 flex items-center justify-center">
@@ -81,7 +81,8 @@ export default function SignupPage() {
             ))}
           </div>
         </div>
-        <div className="relative z-10 mt-xl pt-lg flex justify-between items-center border-t border-outline-variant/50 text-on-surface-variant">
+        {/* Footer pinned to the bottom so it doesn't shift the centered hero. */}
+        <div className="absolute bottom-0 left-0 w-full z-10 px-xl lg:px-[64px] pb-xl lg:pb-[64px] flex justify-between items-center text-on-surface-variant">
           <span className="text-label-sm">© 2024 AITriage Ops</span>
           <div className="flex gap-md">
             <span className="text-label-sm">Privacy</span>
