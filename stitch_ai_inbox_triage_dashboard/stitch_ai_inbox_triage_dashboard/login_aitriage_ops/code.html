@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AITriage Ops - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap');
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#c6c6cb",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#646469",
+                        "primary-fixed": "#e3dfff",
+                        "surface-dim": "#d3daea",
+                        "surface-tint": "#584fbc",
+                        "on-primary-fixed-variant": "#3f35a3",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#1a1c1f",
+                        "surface-variant": "#dce2f3",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#e4e1e8",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "tertiary": "#414347",
+                        "on-background": "#151c27",
+                        "surface-container-low": "#f0f3ff",
+                        "tertiary-container": "#585a5e",
+                        "on-secondary-fixed-variant": "#46464c",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#45474b",
+                        "on-primary-fixed": "#140067",
+                        "surface": "#f9f9ff",
+                        "on-surface": "#151c27",
+                        "secondary-fixed-dim": "#c8c5cc",
+                        "inverse-primary": "#c5c0ff",
+                        "surface-container-high": "#e2e8f8",
+                        "secondary": "#5e5e63",
+                        "on-primary-container": "#d1ccff",
+                        "on-secondary-fixed": "#1b1b20",
+                        "on-surface-variant": "#474553",
+                        "primary-fixed-dim": "#c5c0ff",
+                        "primary": "#3b309e",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#d1d1d6",
+                        "outline-variant": "#c8c4d5",
+                        "inverse-surface": "#2a313d",
+                        "surface-container": "#e7eefe",
+                        "outline": "#787584",
+                        "surface-container-highest": "#dce2f3",
+                        "background": "#f9f9ff",
+                        "surface-bright": "#f9f9ff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "secondary-container": "#e4e1e8",
+                        "primary-container": "#534ab7",
+                        "tertiary-fixed": "#e2e2e7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xxl": "64px",
+                        "md": "16px",
+                        "auth-card-width": "440px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "label-sm": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "display-hero": ["Geist"],
+                        "body-md": ["Geist"],
+                        "headline-lg-mobile": ["Geist"],
+                        "body-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-hero": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .geometric-bg {
+            background-image: radial-gradient(circle at 2px 2px, rgba(83, 74, 183, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .custom-shadow-lift {
+            box-shadow: 0px 4px 20px rgba(83, 74, 183, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex text-on-surface antialiased">
+<!-- Top Loading Bar (Brand Element) -->
+<div class="fixed top-0 left-0 w-full h-1 bg-primary-container z-50"></div>
+<main class="flex-1 flex flex-col md:flex-row w-full h-screen">
+<!-- Left Hero Area (Hidden on Mobile) -->
+<section class="hidden md:flex md:w-1/2 lg:w-3/5 bg-surface-container-low geometric-bg flex-col justify-center items-start p-xxl relative overflow-hidden">
+<!-- Subtle Gradient Overlay -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary-fixed/30 to-transparent pointer-events-none"></div>
+<div class="relative z-10 max-w-lg">
+<h1 class="font-display-hero text-display-hero text-on-surface mb-lg">
+                    Automate the inbox.<br/>
+<span class="text-primary-container">Empower the team.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                    Precision engineering for modern operations. AITriage Ops streamlines your data flow with intelligent, context-aware automation designed for high-performance environments.
+                </p>
+<!-- Abstract visual element placeholder -->
+<div class="mt-xl h-64 w-full bg-surface/50 rounded-xl border border-outline-variant/50 flex items-center justify-center relative overflow-hidden backdrop-blur-sm">
+<img alt="Data visualization dashboard" class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay" data-alt="A clean, abstract data visualization interface floating on a light screen. The interface shows minimalist charts, flowing lines, and technical nodes in shades of deep violet and slate. The aesthetic is modern, corporate, and highly precise, reflecting an advanced engineering platform. The background is a soft, bright workspace, emphasizing clarity and reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8VgAJVqNA8ak2ING3AJH_sHPJpQtXOTX4zf2xCZYcB2-AxzRClzU1S0Z0Y_VRWF-Lh84weNF6hN7jLJNXlsime2YA0c1J7ynESZ7z0rGomKoFr__fNAxwuDtY-4XLe_daFRSJVIZ7BJU17rlzw6iODh07eHC-u72-gJt1FGWYUcw5LPkduMN_2ZG2oUv-ZlZ7nEIlPm3v-qcPIYJI6CIyu7g_NPNIwgR3W0PombovtkQHyfefPqrO9-OTYn9HKog9kogGp24t3Dbc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+</div>
+</div>
+</section>
+<!-- Right Login Area -->
+<section class="w-full md:w-1/2 lg:w-2/5 flex items-center justify-center p-md md:p-xl bg-surface relative">
+<!-- Auth Card -->
+<div class="w-full max-w-[440px] bg-surface-container-lowest rounded-xl border border-outline-variant/30 custom-shadow-lift p-xl relative z-10">
+<!-- Logo & Header -->
+<div class="text-center mb-xl">
+<div class="font-headline-md text-headline-md font-semibold text-primary mb-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">schema</span>
+                        AITriage Ops
+                    </div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-xs">Welcome back</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Sign in to your operational dashboard.</p>
+</div>
+<!-- Social Logins -->
+<div class="flex flex-col gap-sm mb-lg">
+<button class="w-full flex items-center justify-center gap-sm py-md px-md rounded-lg border border-outline-variant bg-transparent hover:bg-surface-container transition-colors focus:outline-none focus:ring-2 focus:ring-primary-container/50" type="button">
+<!-- Generic SVG for Google as standard web icon -->
+<svg class="w-5 h-5" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span class="font-label-md text-label-md text-on-surface">Continue with Google</span>
+</button>
+<button class="w-full flex items-center justify-center gap-sm py-md px-md rounded-lg border border-outline-variant bg-transparent hover:bg-surface-container transition-colors focus:outline-none focus:ring-2 focus:ring-primary-container/50" type="button">
+<svg class="w-5 h-5" fill="none" viewbox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#F25022" height="9" width="9" x="1" y="1"></rect>
+<rect fill="#7FBA00" height="9" width="9" x="11" y="1"></rect>
+<rect fill="#00A4EF" height="9" width="9" x="1" y="11"></rect>
+<rect fill="#FFB900" height="9" width="9" x="11" y="11"></rect>
+</svg>
+<span class="font-label-md text-label-md text-on-surface">Continue with Microsoft</span>
+</button>
+</div>
+<div class="flex items-center mb-lg">
+<div class="flex-grow h-px bg-outline-variant/50"></div>
+<span class="px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">or sign in with email</span>
+<div class="flex-grow h-px bg-outline-variant/50"></div>
+</div>
+<!-- Login Form -->
+<form class="flex flex-col gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="email">Work Email</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-sm flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size: 20px;">mail</span>
+</div>
+<input class="w-full pl-[40px] pr-sm py-[10px] bg-surface-container-lowest border border-outline-variant rounded focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50" id="email" name="email" placeholder="name@company.com" required="" type="email"/>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface" for="password">Password</label>
+<a class="font-label-sm text-label-sm text-primary-container hover:text-on-primary-fixed-variant transition-colors" href="#">Forgot password?</a>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-sm flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size: 20px;">lock</span>
+</div>
+<input class="w-full pl-[40px] pr-sm py-[10px] bg-surface-container-lowest border border-outline-variant rounded focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 transition-all font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<div class="flex items-center gap-sm mt-xs mb-sm">
+<input class="w-4 h-4 rounded-sm border-outline-variant text-primary-container focus:ring-primary-container/20 bg-surface-container-lowest cursor-pointer" id="remember" name="remember" type="checkbox"/>
+<label class="font-body-md text-body-md text-on-surface-variant cursor-pointer select-none" for="remember">Remember this device</label>
+</div>
+<button class="w-full bg-primary-container hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-label-md py-[12px] rounded-lg transition-colors flex justify-center items-center gap-sm" type="submit">
+                        Sign In
+                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+</button>
+</form>
+<!-- Footer Link -->
+<div class="mt-xl text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Don't have an account? 
+                        <a class="font-label-md text-label-md text-primary-container hover:text-on-primary-fixed-variant transition-colors font-semibold ml-xs" href="#">Sign up</a>
+</p>
+</div>
+</div>
+<!-- Bottom Legal (Visible only if enough vertical space) -->
+<div class="absolute bottom-lg left-0 w-full text-center hidden sm:block">
+<p class="font-label-sm text-label-sm text-on-surface-variant/70">
+                    © 2024 AITriage Ops. Precision Engineering.
+                </p>
+</div>
+</section>
+</main>
+<script>
+        // Simple micro-interaction for the form submit to simulate loading
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin" style="font-size: 18px;">progress_activity</span> Authenticating...`;
+            btn.classList.add('opacity-90', 'cursor-not-allowed');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.classList.remove('opacity-90', 'cursor-not-allowed');
+                // Normally redirect here
+            }, 1500);
+        });
+    </script>
+</body></html>

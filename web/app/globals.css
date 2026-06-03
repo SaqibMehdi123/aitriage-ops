@@ -42,6 +42,12 @@ body {
 .triage-mark { animation: triage-pulse 1.4s ease-in-out infinite; }
 .triage-dot { animation: triage-bounce 1.2s ease-in-out infinite; }
 
+/* Subtle amber dot-grid for the auth hero panels (matches the supplied design). */
+.dot-grid {
+  background-image: radial-gradient(circle at 2px 2px, rgba(180, 83, 9, 0.07) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
 /* Material Symbols icon helper — matches the Stitch templates. */
 .material-symbols-outlined {
   font-family: "Material Symbols Outlined";

@@ -1,17 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Icon, Logo } from "@/components/ui";
-
-const PAGE_GRADIENT = "linear-gradient(135deg,#1c1917 0%,#292524 45%,#44403c 100%)";
-const BTN_GRADIENT = "linear-gradient(135deg,#f59e0b 0%,#d97706 100%)";
+import AuthSocial from "@/components/AuthSocial";
 
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -24,22 +22,10 @@ export default function LoginPage() {
     setInfo(null);
     setLoading(true);
     try {
-      if (mode === "signin") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        router.push("/queue");
-        router.refresh();
-      } else {
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        if (data.session) {
-          router.push("/queue");
-          router.refresh();
-        } else {
-          setInfo("Account created. Check your email to confirm, then sign in.");
-          setMode("signin");
-        }
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      router.push("/queue");
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -47,91 +33,132 @@ export default function LoginPage() {
     }
   }
 
+  async function forgotPassword() {
+    if (!email) {
+      setError("Enter your email above first, then click “Forgot password?”.");
+      return;
+    }
+    setError(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/login`,
+    });
+    if (error) setError(error.message);
+    else setInfo("Password reset link sent — check your email.");
+  }
+
   return (
-    <main
-      className="min-h-screen flex items-center justify-center px-margin-mobile py-xl relative overflow-hidden"
-      style={{ background: PAGE_GRADIENT }}
-    >
-      {/* decorative glows */}
-      <div className="pointer-events-none absolute -top-40 -left-40 w-[28rem] h-[28rem] rounded-full opacity-25"
-        style={{ background: "radial-gradient(circle,#f59e0b,transparent 70%)" }} />
-      <div className="pointer-events-none absolute -bottom-48 -right-40 w-[32rem] h-[32rem] rounded-full opacity-20"
-        style={{ background: "radial-gradient(circle,#fbbf24,transparent 70%)" }} />
+    <main className="min-h-screen flex text-on-surface">
+      <div className="fixed top-0 left-0 w-full h-1 bg-primary z-50" />
 
-      <div className="relative w-full max-w-[26rem]">
-        {/* Brand */}
-        <div className="flex flex-col items-center text-center mb-lg">
-          <Logo size={56} className="mb-md" />
-          <h1 className="text-headline-md font-bold tracking-tight text-white">
-            AITriage <span className="text-white/70 font-light">Ops</span>
+      {/* Left hero */}
+      <section className="hidden md:flex md:w-1/2 lg:w-3/5 bg-surface-container-low dot-grid flex-col justify-center items-start p-xl lg:p-[64px] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed/40 to-transparent pointer-events-none" />
+        <div className="relative z-10 max-w-lg">
+          <h1 className="text-display-lg lg:text-[40px] lg:leading-[48px] font-semibold tracking-tight mb-lg">
+            Automate the inbox.<br />
+            <span className="text-primary">Empower the team.</span>
           </h1>
-          <p className="text-body-sm text-white/60 mt-unit">AI inbox triage &amp; reply router</p>
-        </div>
-
-        {/* Card */}
-        <div className="rounded-2xl bg-white/95 backdrop-blur-sm border border-white/40 shadow-2xl p-xl">
-          <h2 className="text-headline-sm text-on-surface mb-xs">
-            {mode === "signin" ? "Welcome back" : "Create your workspace"}
-          </h2>
-          <p className="text-body-sm text-on-surface-variant mb-lg">
-            {mode === "signin" ? "Sign in to your triage queue." : "Spin up your organisation and inbox."}
+          <p className="text-body-md text-on-surface-variant lg:text-body-md">
+            Precision engineering for modern operations. AITriage Ops streamlines your
+            data flow with intelligent, context-aware automation designed for
+            high-performance environments.
           </p>
+
+          {/* Decorative mini-dashboard */}
+          <div className="mt-xl rounded-xl border border-outline-variant bg-surface-container-lowest/70 backdrop-blur-sm p-lg shadow-elevated">
+            <div className="flex items-center justify-between mb-md">
+              <span className="text-label-sm text-on-surface-variant uppercase tracking-wide">Processing volume</span>
+              <span className="text-label-sm text-primary font-semibold">+18%</span>
+            </div>
+            <svg viewBox="0 0 300 90" className="w-full h-24">
+              <polyline fill="none" stroke="#d97706" strokeWidth="2.5"
+                points="0,70 40,60 80,64 120,40 160,46 200,28 240,32 300,16" />
+              <polyline fill="none" stroke="#57534e" strokeWidth="2" strokeOpacity="0.5"
+                points="0,80 40,76 80,78 120,68 160,72 200,64 240,66 300,58" />
+            </svg>
+            <div className="flex gap-sm mt-md">
+              {["Support", "Sales", "Billing"].map((c, i) => (
+                <span key={c} className={`text-label-sm px-sm py-unit rounded-full ${["bg-primary-fixed text-on-primary-fixed", "bg-tertiary-fixed text-on-tertiary-fixed", "bg-secondary-fixed text-on-secondary-fixed"][i]}`}>{c}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Right form */}
+      <section className="w-full md:w-1/2 lg:w-2/5 flex items-center justify-center p-md md:p-xl bg-surface relative">
+        <div className="w-full max-w-[440px] bg-surface-container-lowest rounded-xl border border-outline-variant/40 shadow-elevated p-xl">
+          <div className="text-center mb-xl">
+            <div className="flex items-center justify-center gap-sm mb-md">
+              <Logo size={36} />
+              <span className="text-headline-sm font-bold text-on-surface">AITriage Ops</span>
+            </div>
+            <h2 className="text-headline-md mb-xs">Welcome back</h2>
+            <p className="text-body-sm text-on-surface-variant">Sign in to your operational dashboard.</p>
+          </div>
+
+          <AuthSocial providers={["google", "azure"]} />
+
+          <div className="flex items-center my-lg">
+            <div className="flex-grow h-px bg-outline-variant/60" />
+            <span className="px-md text-label-sm text-on-surface-variant uppercase tracking-wider">or sign in with email</span>
+            <div className="flex-grow h-px bg-outline-variant/60" />
+          </div>
 
           <form onSubmit={onSubmit} className="flex flex-col gap-md">
             <label className="flex flex-col gap-xs">
-              <span className="text-label-md text-on-surface-variant">Email</span>
+              <span className="text-label-md text-on-surface">Work Email</span>
               <div className="relative">
-                <Icon name="mail" className="absolute left-sm top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant" />
+                <Icon name="mail" className="absolute left-sm top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant" />
                 <input
                   type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-10 pr-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="you@company.com"
+                  className="w-full pl-10 pr-md py-sm rounded-lg border border-outline-variant bg-surface-container-lowest text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="name@company.com"
                 />
               </div>
             </label>
             <label className="flex flex-col gap-xs">
-              <span className="text-label-md text-on-surface-variant">Password</span>
+              <div className="flex justify-between items-center">
+                <span className="text-label-md text-on-surface">Password</span>
+                <button type="button" onClick={forgotPassword} className="text-label-sm text-primary hover:underline">Forgot password?</button>
+              </div>
               <div className="relative">
-                <Icon name="lock" className="absolute left-sm top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant" />
+                <Icon name="lock" className="absolute left-sm top-1/2 -translate-y-1/2 text-[20px] text-on-surface-variant" />
                 <input
                   type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-10 pr-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-full pl-10 pr-md py-sm rounded-lg border border-outline-variant bg-surface-container-lowest text-body-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="••••••••"
                 />
               </div>
             </label>
 
-            {error && (
-              <p className="text-label-md text-on-error-container bg-error-container rounded-lg px-md py-sm">{error}</p>
-            )}
-            {info && (
-              <p className="text-label-md text-on-secondary-fixed bg-secondary-fixed rounded-lg px-md py-sm">{info}</p>
-            )}
+            <label className="flex items-center gap-sm text-body-sm text-on-surface-variant cursor-pointer select-none">
+              <input type="checkbox" defaultChecked className="w-4 h-4 rounded-sm accent-[#b45309]" />
+              Remember this device
+            </label>
+
+            {error && <p className="text-label-md text-on-error-container bg-error-container rounded-lg px-md py-sm">{error}</p>}
+            {info && <p className="text-label-md text-on-tertiary-fixed bg-tertiary-fixed rounded-lg px-md py-sm">{info}</p>}
 
             <button
-              type="submit" disabled={loading} style={{ background: BTN_GRADIENT }}
-              className="mt-xs rounded-lg text-white py-sm text-label-md font-semibold hover:opacity-95 transition-opacity disabled:opacity-60 shadow-md"
+              type="submit" disabled={loading}
+              className="w-full bg-primary hover:bg-primary-container text-on-primary text-label-md font-semibold py-sm rounded-lg transition-colors flex justify-center items-center gap-sm disabled:opacity-60"
             >
-              {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Create workspace"}
+              {loading ? "Authenticating…" : "Sign In"}
+              {!loading && <Icon name="arrow_forward" className="text-[18px]" />}
             </button>
           </form>
 
-          <p className="text-body-sm text-on-surface-variant mt-lg text-center">
-            {mode === "signin" ? "New here?" : "Already have an account?"}{" "}
-            <button
-              type="button"
-              onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); setInfo(null); }}
-              className="text-primary font-semibold hover:underline"
-            >
-              {mode === "signin" ? "Create an account" : "Sign in"}
-            </button>
+          <p className="mt-xl text-center text-body-sm text-on-surface-variant">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="text-primary font-semibold hover:underline">Sign up</Link>
           </p>
         </div>
 
-        <p className="text-center text-label-sm text-white/50 mt-lg">
-          Classify · draft · route — with a human in control.
-        </p>
-      </div>
+        <div className="absolute bottom-lg left-0 w-full text-center hidden sm:block">
+          <p className="text-label-sm text-on-surface-variant/70">© 2024 AITriage Ops. Precision Engineering.</p>
+        </div>
+      </section>
     </main>
   );
 }

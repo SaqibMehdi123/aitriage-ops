@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign Up - AITriage Ops</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#c6c6cb",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#646469",
+                        "primary-fixed": "#e3dfff",
+                        "surface-dim": "#d3daea",
+                        "surface-tint": "#584fbc",
+                        "on-primary-fixed-variant": "#3f35a3",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#1a1c1f",
+                        "surface-variant": "#dce2f3",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#e4e1e8",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "tertiary": "#414347",
+                        "on-background": "#151c27",
+                        "surface-container-low": "#f0f3ff",
+                        "tertiary-container": "#585a5e",
+                        "on-secondary-fixed-variant": "#46464c",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#45474b",
+                        "on-primary-fixed": "#140067",
+                        "surface": "#f9f9ff",
+                        "on-surface": "#151c27",
+                        "secondary-fixed-dim": "#c8c5cc",
+                        "inverse-primary": "#c5c0ff",
+                        "surface-container-high": "#e2e8f8",
+                        "secondary": "#5e5e63",
+                        "on-primary-container": "#d1ccff",
+                        "on-secondary-fixed": "#1b1b20",
+                        "on-surface-variant": "#474553",
+                        "primary-fixed-dim": "#c5c0ff",
+                        "primary": "#3b309e",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#d1d1d6",
+                        "outline-variant": "#c8c4d5",
+                        "inverse-surface": "#2a313d",
+                        "surface-container": "#e7eefe",
+                        "outline": "#787584",
+                        "surface-container-highest": "#dce2f3",
+                        "background": "#f9f9ff",
+                        "surface-bright": "#f9f9ff",
+                        "inverse-on-surface": "#ebf1ff",
+                        "secondary-container": "#e4e1e8",
+                        "primary-container": "#534ab7",
+                        "tertiary-fixed": "#e2e2e7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xxl": "64px",
+                        "md": "16px",
+                        "auth-card-width": "440px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "label-sm": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "display-hero": ["Geist"],
+                        "body-md": ["Geist"],
+                        "headline-lg-mobile": ["Geist"],
+                        "body-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-hero": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .mesh-gradient-bg {
+            background-color: #f9f9ff;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(245,63%,85%,0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(252,65%,85%,0.3) 0px, transparent 50%);
+        }
+        .pattern-bg {
+            background-image: radial-gradient(#dce2f3 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .soft-lift {
+            box-shadow: 0px 4px 20px rgba(83, 74, 183, 0.06);
+        }
+        
+        /* Progress indicator for signup */
+        .signup-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: #534ab7;
+            width: 0%;
+            z-index: 100;
+            transition: width 0.4s ease;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md text-body-md overflow-x-hidden antialiased">
+<div class="signup-progress" id="progress-bar"></div>
+<main class="flex min-h-screen w-full flex-col lg:flex-row">
+<!-- Left Column: Value Proposition -->
+<section class="hidden lg:flex w-full lg:w-1/2 flex-col justify-between p-xxl bg-surface-container-low mesh-gradient-bg border-r border-outline-variant/30 relative overflow-hidden">
+<!-- Technical Decor -->
+<div class="absolute inset-0 pattern-bg opacity-40 pointer-events-none"></div>
+<div class="relative z-10">
+<a class="flex items-center gap-sm mb-xxl" href="#">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">hexagon</span>
+<span class="font-headline-md text-headline-md font-semibold text-primary">AITriage Ops</span>
+</a>
+<div class="mt-xxl pt-xxl">
+<h1 class="font-display-hero text-display-hero text-on-surface mb-xl max-w-md">
+                        Engineered for High-Performance Operations.
+                    </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-xxl max-w-md">
+                        Join the platform that transforms chaotic data into precise, actionable intelligence with unmatched speed.
+                    </p>
+<div class="space-y-xl max-w-md">
+<!-- Value Prop 1 -->
+<div class="flex gap-md">
+<div class="flex-shrink-0 w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center border border-outline-variant/50">
+<span class="material-symbols-outlined text-primary-container" data-icon="smart_toy">smart_toy</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">AI-Powered Triage</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Automatically categorize and prioritize incoming operational tickets with 99.9% accuracy.</p>
+</div>
+</div>
+<!-- Value Prop 2 -->
+<div class="flex gap-md">
+<div class="flex-shrink-0 w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center border border-outline-variant/50">
+<span class="material-symbols-outlined text-primary-container" data-icon="route">route</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">Smart Routing</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Direct complex issues to the exact right engineering team based on workload and expertise.</p>
+</div>
+</div>
+<!-- Value Prop 3 -->
+<div class="flex gap-md">
+<div class="flex-shrink-0 w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center border border-outline-variant/50">
+<span class="material-symbols-outlined text-primary-container" data-icon="insights">insights</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface text-[18px]">Actionable Analytics</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Deep dive into operational bottlenecks with real-time, high-fidelity metrics.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="relative z-10 mt-auto pt-xxl flex justify-between items-center border-t border-outline-variant/50 text-on-surface-variant">
+<span class="font-label-sm text-label-sm">© 2024 AITriage Ops</span>
+<div class="flex gap-md">
+<a class="font-label-sm text-label-sm hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="font-label-sm text-label-sm hover:text-primary transition-colors" href="#">Terms</a>
+</div>
+</div>
+</section>
+<!-- Right Column: Signup Form -->
+<section class="flex-1 flex flex-col justify-center items-center p-md md:p-xl bg-surface relative">
+<!-- Mobile Logo (hidden on desktop where it's on the left) -->
+<div class="lg:hidden flex justify-center mb-xl w-full max-w-[440px]">
+<a class="flex items-center gap-sm" href="#">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">hexagon</span>
+<span class="font-headline-md text-headline-md font-semibold text-primary">AITriage Ops</span>
+</a>
+</div>
+<!-- Auth Card -->
+<div class="w-full max-w-[440px] bg-surface-container-lowest rounded-xl p-lg md:p-xl border border-outline-variant/40 soft-lift">
+<div class="mb-xl text-center">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Get started for free</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Deploy precision operations in minutes.</p>
+</div>
+<!-- Social Auth -->
+<div class="space-y-sm mb-lg">
+<button class="w-full flex items-center justify-center gap-sm py-2 px-4 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-md text-label-md transition-colors h-11">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB78SnYC9aStJu9H7i9ydd0HZlIbBGREx9Jr5IXxEmR0XtHKJ3x2Y4vshI6_bZIN0Gh1WbO_YaHqwq7I_C3SYsL6DfXIsVyEaw55GEF9DDnDXKD7tIE1x_5oMawZchk01cwryPQS11uG_yYlvwcDP9FGI0TE_DbYnlET5YkAE20-7y0T-mTT-EBuKvhpYohC-_4N3WP9gABUUvGx4ItZDFx8WOIDKuO1ica6q93HBSPYlPfWC1ggIgZgF2iX-ahJG8u1f4VGhoRU9zr"/>
+                        Continue with Google
+                    </button>
+<button class="w-full flex items-center justify-center gap-sm py-2 px-4 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-md text-label-md transition-colors h-11">
+<svg aria-hidden="true" class="w-5 h-5 text-[#181717]" fill="currentColor" viewbox="0 0 24 24">
+<path clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill-rule="evenodd"></path>
+</svg>
+                        Continue with GitHub
+                    </button>
+</div>
+<div class="flex items-center gap-md mb-lg">
+<div class="h-px bg-outline-variant flex-1"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">or sign up with email</span>
+<div class="h-px bg-outline-variant flex-1"></div>
+</div>
+<!-- Form -->
+<form class="space-y-md" id="signup-form">
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="fullName">Full Name</label>
+<input class="w-full px-4 py-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 outline-none transition-all placeholder:text-outline h-11" id="fullName" name="fullName" placeholder="Jane Doe" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="workEmail">Work Email</label>
+<input class="w-full px-4 py-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 outline-none transition-all placeholder:text-outline h-11" id="workEmail" name="workEmail" placeholder="jane@company.com" required="" type="email"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="password">Password</label>
+<input class="w-full px-4 py-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-body-md text-body-md focus:border-primary-container focus:ring-2 focus:ring-primary-container/20 outline-none transition-all placeholder:text-outline h-11" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+<div class="pt-sm pb-xs">
+<button class="w-full bg-primary-container hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-label-md py-2 px-4 rounded-lg transition-colors h-11 flex justify-center items-center" type="submit">
+                            Create Account
+                        </button>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center mt-sm">
+                        By signing up, you agree to our <a class="text-primary hover:underline" href="#">Terms of Service</a> and <a class="text-primary hover:underline" href="#">Privacy Policy</a>.
+                    </p>
+</form>
+</div>
+<div class="mt-xl text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Already have an account? <a class="text-primary font-medium hover:underline" href="#">Log in</a>
+</p>
+</div>
+</section>
+</main>
+<script>
+        // Simple form interaction to show the progress bar aesthetic
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            
+            // UI Feedback
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin" style="font-size: 18px;">progress_activity</span>';
+            btn.disabled = true;
+            btn.classList.add('opacity-80');
+            
+            // Progress bar animation
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = '30%';
+            
+            setTimeout(() => {
+                progressBar.style.width = '70%';
+            }, 600);
+            
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+                
+                // Reset after fake delay
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-80');
+                    progressBar.style.width = '0%';
+                }, 500);
+            }, 1200);
+        });
+        
+        // Input focus progress hint (micro-interaction)
+        const inputs = document.querySelectorAll('input');
+        const progressBar = document.getElementById('progress-bar');
+        
+        inputs.forEach((input, index) => {
+            input.addEventListener('focus', () => {
+                const progress = ((index + 1) / inputs.length) * 10; // small hint progress
+                if (progressBar.style.width === '0%' || progressBar.style.width === '') {
+                   progressBar.style.width = `${progress}%`;
+                }
+            });
+            input.addEventListener('blur', () => {
+                if(input.value === '') {
+                     progressBar.style.width = '0%';
+                }
+            });
+        });
+    </script>
+</body></html>
