@@ -85,7 +85,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-margin-desktop max-w-container-max">
+    <div className="p-margin-mobile sm:p-margin-desktop max-w-container-max">
       <header className="mb-lg">
         <h1 className="text-display-lg">Settings</h1>
         <p className="text-body-md text-on-surface-variant">
@@ -97,9 +97,9 @@ export default function SettingsPage() {
       {notice && <div className="mb-md rounded-lg border border-tertiary-fixed bg-tertiary-fixed text-on-tertiary-fixed px-md py-sm text-body-sm">{notice}</div>}
 
       {/* Connected mailboxes */}
-      <section className="rounded-xl border border-outline-variant bg-surface-container-lowest p-lg mb-lg">
-        <h2 className="text-headline-sm mb-xs">Mailbox Connection</h2>
-        <p className="text-body-sm text-on-surface-variant mb-md">
+      <section className="rounded-xl border border-outline-variant bg-surface-container-lowest p-lg sm:p-xl mb-lg">
+        <h2 className="text-headline-sm mb-sm">Mailbox Connection</h2>
+        <p className="text-body-sm text-on-surface-variant mb-lg">
           Connect a shared inbox so incoming email is triaged automatically.
         </p>
 
@@ -108,10 +108,10 @@ export default function SettingsPage() {
         ) : accounts.length > 0 ? (
           <div className="flex flex-col gap-sm mb-lg">
             {accounts.map((a) => (
-              <div key={a.id} className="flex items-center justify-between rounded-lg border border-outline-variant bg-surface-container-low px-md py-sm">
-                <div className="flex items-center gap-sm min-w-0">
+              <div key={a.id} className="flex items-center justify-between gap-md rounded-lg border border-outline-variant bg-surface-container-low p-md">
+                <div className="flex items-center gap-md min-w-0">
                   <Icon name="alternate_email" className="text-on-surface-variant" />
-                  <div className="min-w-0">
+                  <div className="min-w-0 space-y-unit">
                     <p className="text-body-sm text-on-surface truncate">{a.email_address}</p>
                     <p className="text-label-sm text-on-surface-variant">
                       via {a.provider.toUpperCase()} · {a.last_synced_at ? `last synced ${new Date(a.last_synced_at).toLocaleString()}` : "not synced yet"}
@@ -129,35 +129,35 @@ export default function SettingsPage() {
         ) : null}
 
         {/* IMAP connect form */}
-        <div className="rounded-lg border border-dashed border-outline-variant p-md">
-          <p className="text-label-md text-on-surface mb-sm flex items-center gap-xs">
+        <div className="rounded-lg border border-dashed border-outline-variant p-lg">
+          <p className="text-label-md text-on-surface mb-md flex items-center gap-xs">
             <Icon name="add_link" className="text-[18px]" /> Connect a mailbox (IMAP / Gmail app password)
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
             <input value={host} onChange={(e) => setHost(e.target.value)} placeholder="IMAP host (imap.gmail.com)"
-              className="rounded border border-outline-variant bg-surface-container-lowest px-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              className="rounded border border-outline-variant bg-surface-container-lowest px-md py-2.5 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" />
             <input type="number" value={port} onChange={(e) => setPort(Number(e.target.value))} placeholder="Port (993)"
-              className="rounded border border-outline-variant bg-surface-container-lowest px-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              className="rounded border border-outline-variant bg-surface-container-lowest px-md py-2.5 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" />
             <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="you@gmail.com"
-              className="rounded border border-outline-variant bg-surface-container-lowest px-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              className="rounded border border-outline-variant bg-surface-container-lowest px-md py-2.5 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" />
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="16-char app password"
-              className="rounded border border-outline-variant bg-surface-container-lowest px-md py-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              className="rounded border border-outline-variant bg-surface-container-lowest px-md py-2.5 text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" />
           </div>
           <button onClick={connect} disabled={busy || !username || !password}
-            className="mt-sm rounded bg-primary text-on-primary px-md py-sm text-label-md font-medium hover:bg-primary-container transition-colors disabled:opacity-60 flex items-center gap-xs">
+            className="mt-md rounded bg-primary text-on-primary px-md py-sm text-label-md font-medium hover:bg-primary-container transition-colors disabled:opacity-60 flex items-center gap-xs">
             <Icon name="link" className="text-[18px]" /> {busy ? "Connecting…" : "Connect mailbox"}
           </button>
-          <p className="text-label-sm text-on-surface-variant mt-sm">
+          <p className="text-label-sm text-on-surface-variant mt-md">
             Gmail: enable 2-Step Verification, then create an App Password and paste it here. Credentials are encrypted at rest.
           </p>
         </div>
       </section>
 
-      <section className="rounded-xl border border-outline-variant bg-surface-container-lowest p-lg">
-        <h2 className="text-headline-sm mb-md">Privacy &amp; Security</h2>
+      <section className="rounded-xl border border-outline-variant bg-surface-container-lowest p-lg sm:p-xl">
+        <h2 className="text-headline-sm mb-lg">Privacy &amp; Security</h2>
 
-        <div className="flex items-center justify-between py-sm border-b border-surface-container-high">
-          <div>
+        <div className="flex items-center justify-between gap-md py-md border-b border-surface-container-high">
+          <div className="space-y-unit">
             <p className="text-body-sm text-on-surface font-medium">PII redaction</p>
             <p className="text-label-sm text-on-surface-variant">Mask emails, phone numbers, and cards before any AI call.</p>
           </div>
@@ -171,8 +171,8 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        <div className="flex items-center justify-between py-sm">
-          <div>
+        <div className="flex items-center justify-between gap-md py-md">
+          <div className="space-y-unit">
             <p className="text-body-sm text-on-surface font-medium">Data retention</p>
             <p className="text-label-sm text-on-surface-variant">Automatically remove emails older than this window.</p>
           </div>
