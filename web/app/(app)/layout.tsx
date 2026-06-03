@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
+import AppShell from "@/components/AppShell";
 import { createClient } from "@/lib/supabase/server";
 
-// Authenticated shell: fixed sidebar + scrollable main content (256px sidebar
-// per the design's fixed-grid desktop layout).
+// Authenticated shell: responsive sidebar (fixed 256px rail on desktop, an
+// off-canvas drawer on mobile/tablet) + scrollable main content.
 export default async function AppLayout({
   children,
 }: {
@@ -15,10 +15,5 @@ export default async function AppLayout({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  return (
-    <div className="h-screen flex bg-background overflow-hidden">
-      <Sidebar />
-      <main className="flex-1 ml-64 h-full overflow-y-auto">{children}</main>
-    </div>
-  );
+  return <AppShell>{children}</AppShell>;
 }

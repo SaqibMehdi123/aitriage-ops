@@ -76,8 +76,8 @@ function QueueInner() {
   const canNext = offset + PAGE_SIZE < total;
 
   return (
-    <div className="p-margin-desktop max-w-container-max">
-      <header className="mb-lg flex items-start justify-between">
+    <div className="p-margin-mobile sm:p-margin-desktop max-w-container-max">
+      <header className="mb-lg flex flex-col gap-md sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-display-lg">Triage Queue</h1>
           <p className="text-body-md text-on-surface-variant">Reviewing incoming support requests.</p>
@@ -103,7 +103,10 @@ function QueueInner() {
       )}
 
       <div className="rounded-xl border border-outline-variant bg-surface-container-lowest overflow-hidden">
-        <table className="w-full text-left">
+        {/* Horizontal scroll so every column (incl. Assignee) stays readable on
+            tablet/mobile instead of being squeezed off-screen. */}
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[920px] text-left">
           <thead>
             <tr className="border-b border-outline-variant text-label-sm text-on-surface-variant uppercase tracking-wide">
               <th className="px-lg py-md font-semibold">Sender</th>
@@ -153,8 +156,9 @@ function QueueInner() {
             ))}
           </tbody>
         </table>
+        </div>
 
-        {loading && <div className="px-lg py-xl flex justify-center"><Spinner label="Loading queue…" /></div>}
+        {loading &&<div className="px-lg py-xl flex justify-center"><Spinner label="Loading queue…" /></div>}
 
         {!loading && items.length === 0 && (
           <div className="px-lg py-xl flex flex-col items-center text-center gap-xs">
@@ -196,7 +200,7 @@ function QueueInner() {
 
 export default function QueuePage() {
   return (
-    <Suspense fallback={<div className="p-margin-desktop"><Spinner label="Loading…" /></div>}>
+    <Suspense fallback={<div className="p-margin-mobile sm:p-margin-desktop"><Spinner label="Loading…" /></div>}>
       <QueueInner />
     </Suspense>
   );

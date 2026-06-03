@@ -15,7 +15,13 @@ const NAV: NavItem[] = [
   { href: "/settings", label: "Settings", icon: "settings" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({
+  open = false,
+  onClose,
+}: {
+  open?: boolean;
+  onClose?: () => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -27,7 +33,14 @@ export default function Sidebar() {
   }
 
   return (
-    <nav className="fixed left-0 top-0 h-screen w-64 border-r border-outline-variant bg-surface flex flex-col py-md shrink-0 z-10">
+    <nav
+      className={[
+        // Off-canvas drawer on mobile/tablet; fixed rail on desktop (lg+).
+        "fixed left-0 top-0 h-screen w-64 border-r border-outline-variant bg-surface flex flex-col py-md shrink-0 z-30",
+        "transition-transform duration-200 ease-out lg:translate-x-0",
+        open ? "translate-x-0" : "-translate-x-full",
+      ].join(" ")}
+    >
       {/* Brand */}
       <div className="px-md mb-xl flex items-center gap-sm">
         <Logo size={36} />
@@ -45,6 +58,7 @@ export default function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={[
                 "flex items-center gap-md px-md py-sm rounded-r-full transition-colors",
                 active
@@ -63,6 +77,7 @@ export default function Sidebar() {
       <div className="mt-auto border-t border-outline-variant pt-sm px-sm flex flex-col gap-xs">
         <Link
           href="/support"
+          onClick={onClose}
           className="flex items-center gap-md px-md py-sm rounded-r-full text-on-surface-variant hover:bg-surface-container transition-colors"
         >
           <span className="material-symbols-outlined">contact_support</span>
