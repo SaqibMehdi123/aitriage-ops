@@ -122,13 +122,13 @@ export default function RulesPage() {
   };
 
   return (
-    <div className="p-margin-desktop max-w-container-max">
-      <header className="mb-lg flex items-start justify-between">
+    <div className="p-margin-mobile sm:p-margin-desktop max-w-container-max">
+      <header className="mb-lg flex flex-col gap-md sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-display-lg">Routing Rules</h1>
           <p className="text-body-md text-on-surface-variant">Manage automated triaging and assignment workflows.</p>
         </div>
-        <button onClick={startNew} className="rounded bg-primary text-on-primary px-md py-sm text-label-md font-medium hover:bg-primary-container transition-colors flex items-center gap-xs">
+        <button onClick={startNew} className="w-full sm:w-auto justify-center rounded bg-primary text-on-primary px-md py-sm text-label-md font-medium hover:bg-primary-container transition-colors flex items-center gap-xs">
           <Icon name="add" className="text-[18px]" /> Add Rule
         </button>
       </header>
