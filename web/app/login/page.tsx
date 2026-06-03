@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Icon, Logo } from "@/components/ui";
 
-const PAGE_GRADIENT = "linear-gradient(135deg,#1e1b4b 0%,#3b2f8f 45%,#6d28d9 100%)";
-const BTN_GRADIENT = "linear-gradient(135deg,#6366f1 0%,#7c3aed 100%)";
+const PAGE_GRADIENT = "linear-gradient(135deg,#1c1917 0%,#292524 45%,#44403c 100%)";
+const BTN_GRADIENT = "linear-gradient(135deg,#f59e0b 0%,#d97706 100%)";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -53,10 +53,10 @@ export default function LoginPage() {
       style={{ background: PAGE_GRADIENT }}
     >
       {/* decorative glows */}
-      <div className="pointer-events-none absolute -top-40 -left-40 w-[28rem] h-[28rem] rounded-full opacity-30"
-        style={{ background: "radial-gradient(circle,#a78bfa,transparent 70%)" }} />
-      <div className="pointer-events-none absolute -bottom-48 -right-40 w-[32rem] h-[32rem] rounded-full opacity-25"
-        style={{ background: "radial-gradient(circle,#6366f1,transparent 70%)" }} />
+      <div className="pointer-events-none absolute -top-40 -left-40 w-[28rem] h-[28rem] rounded-full opacity-25"
+        style={{ background: "radial-gradient(circle,#f59e0b,transparent 70%)" }} />
+      <div className="pointer-events-none absolute -bottom-48 -right-40 w-[32rem] h-[32rem] rounded-full opacity-20"
+        style={{ background: "radial-gradient(circle,#fbbf24,transparent 70%)" }} />
 
       <div className="relative w-full max-w-[26rem]">
         {/* Brand */}

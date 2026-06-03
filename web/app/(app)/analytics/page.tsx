@@ -18,7 +18,7 @@ import { getAnalytics, getAudit } from "@/lib/triage";
 import type { Analytics, AuditEntry } from "@/lib/types";
 import { Icon, Spinner } from "@/components/ui";
 
-const DONUT_COLORS = ["#3b309e", "#6063ee", "#8a4900", "#4648d4", "#787584"];
+const DONUT_COLORS = ["#d97706", "#0f766e", "#57534e", "#b45309", "#a8a29e"];
 
 function fmtDuration(seconds: number | null): string {
   if (seconds == null) return "—";
@@ -109,13 +109,13 @@ export default function AnalyticsPage() {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data?.volume ?? []} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f8" />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#474553" }} tickFormatter={(d) => String(d).slice(5)} />
-                <YAxis tick={{ fontSize: 11, fill: "#474553" }} allowDecimals={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#57534e" }} tickFormatter={(d) => String(d).slice(5)} />
+                <YAxis tick={{ fontSize: 11, fill: "#57534e" }} allowDecimals={false} />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="ai_handled" name="AI handled" stroke="#3b309e" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="human_required" name="Human required" stroke="#8a4900" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="ai_handled" name="AI handled" stroke="#d97706" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="human_required" name="Human required" stroke="#0f766e" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>

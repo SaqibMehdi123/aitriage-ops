@@ -1,9 +1,8 @@
 import type { Config } from "tailwindcss";
 
 /**
- * "Precision Operations" design system (from the Stitch design folder's
- * DESIGN.md). Colours, type scale, spacing, and radii are mirrored here so the
- * React components match the supplied screen templates 1:1.
+ * "Graphite + Amber" — warm neutral grays (stone) with an amber accent.
+ * Semantic tokens drive the whole app, so the entire UI follows this palette.
  */
 const config: Config = {
   darkMode: "class",
@@ -15,53 +14,58 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#3b309e",
-        "primary-container": "#534ab7",
+        // Amber — primary accent / CTAs
+        primary: "#b45309",
+        "primary-container": "#92400e",
         "on-primary": "#ffffff",
-        "on-primary-container": "#d1ccff",
-        "primary-fixed": "#e3dfff",
-        "primary-fixed-dim": "#c5c0ff",
-        "on-primary-fixed": "#140067",
-        "on-primary-fixed-variant": "#3f35a3",
-        "inverse-primary": "#c5c0ff",
-        secondary: "#4648d4",
-        "secondary-container": "#6063ee",
+        "on-primary-container": "#ffffff",
+        "primary-fixed": "#fef3c7",
+        "primary-fixed-dim": "#fcd34d",
+        "on-primary-fixed": "#78350f",
+        "on-primary-fixed-variant": "#92400e",
+        "inverse-primary": "#fcd34d",
+        // Graphite — secondary / neutral accents
+        secondary: "#57534e",
+        "secondary-container": "#e7e5e4",
         "on-secondary": "#ffffff",
-        "on-secondary-container": "#fffbff",
-        "secondary-fixed": "#e1e0ff",
-        "secondary-fixed-dim": "#c0c1ff",
-        "on-secondary-fixed": "#07006c",
-        "on-secondary-fixed-variant": "#2f2ebe",
-        tertiary: "#683500",
-        "tertiary-container": "#8a4900",
+        "on-secondary-container": "#292524",
+        "secondary-fixed": "#e7e5e4",
+        "secondary-fixed-dim": "#d6d3d1",
+        "on-secondary-fixed": "#1c1917",
+        "on-secondary-fixed-variant": "#44403c",
+        // Teal — tertiary (for chart/chip variety)
+        tertiary: "#0f766e",
+        "tertiary-container": "#99f6e4",
         "on-tertiary": "#ffffff",
-        "on-tertiary-container": "#ffc69a",
-        "tertiary-fixed": "#ffdcc3",
-        "tertiary-fixed-dim": "#ffb77d",
-        "on-tertiary-fixed": "#2f1500",
-        "on-tertiary-fixed-variant": "#6e3900",
-        error: "#ba1a1a",
+        "on-tertiary-container": "#134e4a",
+        "tertiary-fixed": "#ccfbf1",
+        "tertiary-fixed-dim": "#5eead4",
+        "on-tertiary-fixed": "#134e4a",
+        "on-tertiary-fixed-variant": "#115e59",
+        // Error
+        error: "#dc2626",
         "on-error": "#ffffff",
-        "error-container": "#ffdad6",
-        "on-error-container": "#93000a",
-        background: "#f9f9ff",
-        "on-background": "#151c27",
-        surface: "#f9f9ff",
-        "surface-dim": "#d3daea",
-        "surface-bright": "#f9f9ff",
+        "error-container": "#fee2e2",
+        "on-error-container": "#991b1b",
+        // Neutral surfaces (stone)
+        background: "#fafaf9",
+        "on-background": "#1c1917",
+        surface: "#fafaf9",
+        "surface-dim": "#e7e5e4",
+        "surface-bright": "#ffffff",
         "surface-container-lowest": "#ffffff",
-        "surface-container-low": "#f0f3ff",
-        "surface-container": "#e7eefe",
-        "surface-container-high": "#e2e8f8",
-        "surface-container-highest": "#dce2f3",
-        "surface-variant": "#dce2f3",
-        "on-surface": "#151c27",
-        "on-surface-variant": "#474553",
-        "inverse-surface": "#2a313d",
-        "inverse-on-surface": "#ebf1ff",
-        outline: "#787584",
-        "outline-variant": "#c8c4d5",
-        "surface-tint": "#584fbc",
+        "surface-container-low": "#f5f5f4",
+        "surface-container": "#efedec",
+        "surface-container-high": "#e7e5e4",
+        "surface-container-highest": "#dedddb",
+        "surface-variant": "#e7e5e4",
+        "on-surface": "#1c1917",
+        "on-surface-variant": "#57534e",
+        "inverse-surface": "#292524",
+        "inverse-on-surface": "#fafaf9",
+        outline: "#a8a29e",
+        "outline-variant": "#e7e5e4",
+        "surface-tint": "#b45309",
       },
       fontFamily: {
         sans: ["Geist", "ui-sans-serif", "system-ui", "sans-serif"],
@@ -101,7 +105,6 @@ const config: Config = {
         "container-max": "1440px",
       },
       boxShadow: {
-        // Level 2 (dropdowns/modals) from DESIGN.md — subtle, diffused.
         elevated:
           "0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)",
       },

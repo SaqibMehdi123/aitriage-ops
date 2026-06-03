@@ -98,14 +98,14 @@ export function Logo({ size = 40, className = "" }: { size?: number; className?:
         width: size,
         height: size,
         borderRadius: Math.round(size * 0.28),
-        background: "linear-gradient(135deg,#818cf8 0%,#6366f1 45%,#7c3aed 100%)",
-        boxShadow: "0 8px 20px rgba(99,102,241,0.35)",
+        background: "linear-gradient(135deg,#fbbf24 0%,#f59e0b 50%,#d97706 100%)",
+        boxShadow: "0 8px 20px rgba(217,119,6,0.35)",
       }}
       aria-hidden
     >
       <svg width={inner} height={inner} viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="5.5" width="18" height="13.5" rx="3.2" stroke="white" strokeWidth="1.9" />
-        <path d="M4.6 8.2 L12 13 L19.4 8.2" stroke="white" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="3" y="5.5" width="18" height="13.5" rx="3.2" stroke="#1c1917" strokeWidth="1.9" />
+        <path d="M4.6 8.2 L12 13 L19.4 8.2" stroke="#1c1917" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </span>
   );
