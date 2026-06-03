@@ -61,7 +61,7 @@ function QueueInner() {
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded border border-outline-variant bg-surface-container-lowest px-md py-sm text-label-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary capitalize"
+      className="w-full sm:w-auto rounded border border-outline-variant bg-surface-container-lowest px-md py-sm text-label-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary capitalize"
     >
       <option value="">{placeholder}</option>
       {options.map((o) => (
@@ -84,13 +84,13 @@ function QueueInner() {
         </div>
         <div className="flex items-center gap-sm">
           <button onClick={load}
-            className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs">
+            className="w-full sm:w-auto justify-center rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors flex items-center gap-xs">
             <Icon name="refresh" className="text-[18px]" /> Refresh
           </button>
         </div>
       </header>
 
-      <div className="flex flex-wrap gap-sm mb-md">
+      <div className="flex flex-col gap-sm mb-md sm:flex-row sm:flex-wrap">
         <Select value={category} onChange={(v) => setParams({ category: v })} placeholder="Category" options={CATEGORIES} />
         <Select value={urgency} onChange={(v) => setParams({ urgency: v })} placeholder="Urgency" options={URGENCIES} />
         <Select value={status} onChange={(v) => setParams({ status: v })} placeholder="Status" options={STATUSES} />
@@ -174,20 +174,20 @@ function QueueInner() {
 
       {/* Pagination */}
       {total > 0 && (
-        <div className="flex items-center justify-between mt-md text-body-sm text-on-surface-variant">
+        <div className="flex flex-col gap-sm mt-md text-body-sm text-on-surface-variant sm:flex-row sm:items-center sm:justify-between">
           <span>Showing <strong className="text-on-surface">{from}–{to}</strong> of {total}</span>
           <div className="flex items-center gap-sm">
             <button
               disabled={!canPrev}
               onClick={() => setParams({ offset: String(Math.max(0, offset - PAGE_SIZE)) }, false)}
-              className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-xs"
+              className="flex-1 sm:flex-none justify-center rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-xs"
             >
               <Icon name="chevron_left" className="text-[18px]" /> Prev
             </button>
             <button
               disabled={!canNext}
               onClick={() => setParams({ offset: String(offset + PAGE_SIZE) }, false)}
-              className="rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-xs"
+              className="flex-1 sm:flex-none justify-center rounded border border-outline-variant px-md py-sm text-label-md hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-xs"
             >
               Next <Icon name="chevron_right" className="text-[18px]" />
             </button>
