@@ -51,7 +51,7 @@ export default function LoginPage() {
       <div className="fixed top-0 left-0 w-full h-1 bg-primary z-50" />
 
       {/* Left hero */}
-      <section className="hidden md:flex md:w-1/2 lg:w-3/5 bg-surface-container-low dot-grid flex-col justify-center items-start p-xl lg:p-[64px] relative overflow-hidden">
+      <section className="hidden md:flex md:w-1/2 lg:w-3/5 bg-surface-container-low dot-grid flex-col justify-center items-center p-xl lg:p-[64px] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed/40 to-transparent pointer-events-none" />
         <div className="relative z-10 max-w-lg">
           <h1 className="text-display-lg lg:text-[40px] lg:leading-[48px] font-semibold tracking-tight mb-lg">
