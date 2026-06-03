@@ -53,7 +53,7 @@ export default function SignupPage() {
       <div className="fixed top-0 left-0 w-full h-1 bg-primary z-50" />
 
       {/* Left value props */}
-      <section className="hidden lg:flex w-1/2 flex-col justify-between p-xl lg:p-[64px] bg-surface-container-low dot-grid border-r border-outline-variant/30 relative overflow-hidden">
+      <section className="hidden md:flex w-1/2 flex-col justify-between p-xl lg:p-[64px] bg-surface-container-low dot-grid border-r border-outline-variant/30 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed/40 to-transparent pointer-events-none" />
         <div className="relative z-10">
           <div className="flex items-center gap-sm mb-xl">
@@ -92,7 +92,7 @@ export default function SignupPage() {
 
       {/* Right form */}
       <section className="flex-1 flex flex-col justify-center items-center p-md md:p-xl bg-surface">
-        <div className="lg:hidden flex items-center gap-sm mb-xl">
+        <div className="md:hidden flex items-center gap-sm mb-xl">
           <Logo size={36} />
           <span className="text-headline-sm font-bold text-on-surface">AITriage Ops</span>
         </div>
